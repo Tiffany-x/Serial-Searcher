@@ -1,0 +1,76 @@
+﻿<Page
+    x:Class="SerialSearcher.DeviceDetails"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SerialSearcher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0, 0, 0, 50">
+            <StackPanel Margin="0, 0, 0, 75">
+                <TextBlock Name="label" FontSize="28" TextWrapping="Wrap" Margin="32, 32, 32, 32"/>
+                <StackPanel Name="stack2" HorizontalAlignment="Center" VerticalAlignment="Center" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto" >
+                    <StackPanel Name="itemStack" Orientation="Horizontal">
+                        <TextBlock Text="Type of device:" Width="150" TextWrapping="Wrap" Margin="16,16,16,16"/>
+                        <StackPanel>
+                            <ComboBox Margin="16,16,16,16"  Width="200" Name="DeviceCombo" IsEditable="True" SelectionChanged="DeviceCombo_SelectionChanged" SelectedItem="DeviceSelected">
+                                <ComboBoxItem Name ="Laptop">Laptop</ComboBoxItem>
+                                <ComboBoxItem Name ="Desktop">Desktop</ComboBoxItem>
+                                <ComboBoxItem Name ="Printer">Printer</ComboBoxItem>
+                                <ComboBoxItem Name ="Mouse">Mouse</ComboBoxItem>
+                                <ComboBoxItem Name ="Toner">Toner</ComboBoxItem>
+                                <ComboBoxItem Name ="LaptopBattery">Battery (Laptop)</ComboBoxItem>
+                                <ComboBoxItem Name ="LaptopKeyboard">Keyboard (Laptop)</ComboBoxItem>
+                                <ComboBoxItem Name ="UPS">UPS</ComboBoxItem>
+                                <ComboBoxItem Name ="DesktopKeyboard">Keyboard (Desktop)</ComboBoxItem>
+                                <ComboBoxItem Name ="Switch">Switch</ComboBoxItem>
+                                <ComboBoxItem Name ="Camera">Camera</ComboBoxItem>
+                                <ComboBoxItem Name ="Telephone">Telephone</ComboBoxItem>
+                                <ComboBoxItem Name ="HDD">Hard Disk (HDD)</ComboBoxItem>
+                                <ComboBoxItem Name ="HandPunch">Hand Punch</ComboBoxItem>
+                                <ComboBoxItem Name ="SSD">SSD</ComboBoxItem>
+                            </ComboBox>
+
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Serial Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="serialNo" x:FieldModifier="public" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Model:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="modelName" TextWrapping="Wrap" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Specifications:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="specs" TextWrapping="Wrap" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="System Installed" Name="systemInstall" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="systInstall" TextWrapping="Wrap" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Invoice Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="invNo" IsEnabled="False" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Delivery Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="deliNo" IsEnabled="False" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Credit Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="credNo" IsEnabled="False" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Button Name="Back" Content="Back" Width="100" Click="backButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,10,50,0" />
+                        <Button Name="Save" Content="Next" Width="100" Click="saveButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,10,50,0" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

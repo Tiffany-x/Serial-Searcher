@@ -1,0 +1,50 @@
+﻿<Page
+    x:Class="SerialSearcher.CreditScanPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SerialSearcher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Name="mainStack">
+            <TextBlock Text=" Credit Note" HorizontalAlignment="Left" FontSize="28" Margin="16,16,16,16"/>
+            <StackPanel Name="stack0" Orientation="Horizontal">
+                <StackPanel Name="stack1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <d:Border Width="2"/>
+                    <Image Height="594" Margin="10" HorizontalAlignment="Center" Width="420" Name="ScannedImage"/>
+
+                </StackPanel>
+                <StackPanel Name="stack2" HorizontalAlignment="Center" VerticalAlignment="Center" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto" Width="272">
+                    <TextBlock Text="Waiting for scanner..." Name="NotificationTextBlock" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="16,16,16,16" VerticalAlignment="Center"/>
+                    <Button Content="View Scan" Click="GetScanButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,16,16,16"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Credit Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBox Name="credNo" IsEnabled="False" BorderThickness="2" Width="150" Margin="16,16,16,16"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Invoice Date:" TextWrapping="Wrap" Width="100" Margin="16,16,16,16"></TextBlock>
+                        <DatePicker Name="invDate" Margin="16,16,16,16"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Button Name="cancelScanButton" Content="Cancel Scan" Click="cancelScanButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,10,50,0"/>
+
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Button Name="Back" Content="Back" Width="100" Click="backButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
+                        <Button Name="Next" Content="Next" IsEnabled="True" Width="100" Click="nextButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
+
+                    </StackPanel>
+
+                </StackPanel>
+
+
+            </StackPanel>
+
+        </StackPanel>
+        
+    </Grid>
+</Page>

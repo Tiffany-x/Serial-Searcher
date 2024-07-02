@@ -1,0 +1,32 @@
+﻿<Page
+    x:Class="SerialSearcher.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SerialSearcher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <NavigationView x:Name="mainNavView"
+                     Loaded="mainNavView_Loaded" 
+                     ItemInvoked="mainNavView_ItemInvoked"
+            PaneDisplayMode="Top" PaneTitle="Serial Searcher">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Name="navItem_addDevicePage" Content="Add a Device"/>
+                <NavigationViewItem x:Name="navItem_searchDevicePage" Content="Search for a Device"/>
+                <NavigationViewItem x:Name="navItem_createUserPage" Content="Create a User"/>
+            </NavigationView.MenuItems>
+
+            <Frame x:Name="ContentFrame"/>
+
+
+            
+            
+        </NavigationView>
+        
+       
+    </Grid>
+</Page>

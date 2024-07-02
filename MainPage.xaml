@@ -1,0 +1,28 @@
+﻿<Page
+    x:Class="SerialSearcher.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SerialSearcher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="730" Height="600">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="730" Height="600">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Employee Number: " TextWrapping="Wrap" Width="150" Margin="16,16,16,16"/>
+                    <TextBox Name="empID" BorderThickness="2" Width="150" Margin="16,16,16,16"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Password: " TextWrapping="Wrap" Width="150" Margin="16,16,16,16"/>
+                    <PasswordBox Name="password" BorderThickness="2" Width="150" Margin="16,16,16,16"/>
+            </StackPanel>
+        </StackPanel>
+            <Button Width="100" Content="login" Background="LightGray" Click="loginButton_Click" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock Text=""  Margin="16,16,16,16" Name="label" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+    </Grid>
+</Page>
