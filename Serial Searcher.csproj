@@ -121,6 +121,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Devices.cs" />
+    <Compile Include="Models.cs" />
     <Compile Include="DeviceRequest.xaml.cs">
       <DependentUpon>DeviceRequest.xaml</DependentUpon>
     </Compile>
@@ -216,6 +218,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
+      <Version>7.1.3</Version>
     </PackageReference>
     <PackageReference Include="MySql.data">
       <Version>8.4.0</Version>

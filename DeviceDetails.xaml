@@ -45,7 +45,7 @@
                         <TextBox Name="modelName" TextWrapping="Wrap" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="Specifications:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                        <TextBlock Name="Specifications" Text="Specifications:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
                         <TextBox Name="specs" TextWrapping="Wrap" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -54,16 +54,16 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Invoice Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBox Name="invNo" IsEnabled="False" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                        <TextBox Name="invNo" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Delivery Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBox Name="deliNo" IsEnabled="False" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                        <TextBox Name="deliNo" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Credit Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBox Name="credNo" IsEnabled="False" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                        <TextBox Name="credNo" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Button Name="Back" Content="Back" Width="100" Click="backButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,10,50,0" />

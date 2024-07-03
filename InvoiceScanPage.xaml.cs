@@ -32,6 +32,7 @@ namespace SerialSearcher
         public static string invoicePath;
         private DeviceWatcher scannerWatcher;
         public static string invoiceNumber = "";
+        
 
 
         public InvoiceScanPage()
@@ -41,14 +42,16 @@ namespace SerialSearcher
             stack0.Width = Window.Current.Bounds.Width * 0.9;
             stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
             stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
-
-
+            invDate.MaxDate = DateTime.Now;
+            if (sameDeli)
+            {
+                invSameDeli_Check.IsChecked = true;
+            }
 
             if (company != null)
             {
                 invNo.Text = invoiceNumber;
                 comp.Text = company;
-                LPONo.Text = LPONumber;
                 invDate.Date = invoiceDate;
             }
             InitDeviceWatcher();
@@ -194,15 +197,17 @@ namespace SerialSearcher
 
         private async void nextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (invNo.Text == "" || invDate.Date == null || comp.Text == "" || LPONo.Text == "")
+            if (invNo.Text == "" || invDate.Date == null || comp.Text == "")
             {
                 error("Please fill in all fields.");
             }
             else
             {
                 string name = invoiceNumber + ".jpg";
-                if (sameDeli)
+                if ((bool)invSameDeli_Check.IsChecked)
                 {
+                    
+
                     try
                     {
                         string folderName = "Invoice Notes";
@@ -221,14 +226,19 @@ namespace SerialSearcher
                             encoder.SetSoftwareBitmap(scannedBitmap);
                             await encoder.FlushAsync();
                         }
+                    saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
+                        DeliveryScanPage.deliveryNumber = invoiceNumber;
+                        System.Diagnostics.Debug.WriteLine("invoice: " + invoiceNumber);
+                        System.Diagnostics.Debug.WriteLine("delivery: " + DeliveryScanPage.deliveryNumber);
+                        clearData();
+                        Frame.Navigate(typeof(CreditScanPage));
                     }
                     catch (Exception ex)
                     {
                         // Log or display the exception message
                         error($"Save failed: {ex.Message}");
                     }
-                    saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, LPONo.Text);
-                    Frame.Navigate(typeof(CreditScanPage));
+                    
                     
                 } else
                 {
@@ -250,8 +260,8 @@ namespace SerialSearcher
                             encoder.SetSoftwareBitmap(scannedBitmap);
                             await encoder.FlushAsync();
                         }
-                        saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, LPONo.Text);
-                        System.Diagnostics.Debug.WriteLine(invDate.Date);
+                        saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
+                        clearData();
                         Frame.Navigate(typeof(DeliveryScanPage));
 
                     }
@@ -284,7 +294,6 @@ namespace SerialSearcher
         {
             DeliveryScanPage.deliveryNumber = invoiceNumber;
             sameDeli = true;
-            
         }
 
         private void invSameDeli_Check_Unchecked(object sender, RoutedEventArgs e)
@@ -295,15 +304,20 @@ namespace SerialSearcher
 
         public static DateTimeOffset invoiceDate;
         public static string company;
-        public static string LPONumber;
         public static bool sameDeli;
 
-        public static void saveDetails(string invoiceNo, DateTimeOffset invDate, string comp, string LPON)
+        private void clearData()
+        {
+            invNo.Text = "";
+            comp.Text = "";
+        }
+
+        public static void saveDetails(string invoiceNo, DateTimeOffset invDate, string comp, bool same)
         {
             invoiceNumber = invoiceNo;
             invoiceDate = invDate;
             company = comp;
-            LPONumber = LPON;
+            sameDeli = same;
         }
 
     }

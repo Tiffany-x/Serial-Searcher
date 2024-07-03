@@ -4,41 +4,55 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SerialSearcher"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+
         <StackPanel>
         <TextBlock Text="Search for a Device" FontSize="28" TextWrapping="Wrap" Margin="32, 32, 32, 32"/>
 
-        <StackPanel Name="mainStack" Orientation="Horizontal">
+        <StackPanel Name="mainStack" Orientation="Horizontal" >
 
-                <StackPanel Name="stack0" HorizontalAlignment="Center"  Margin="16,16,16,16">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Serial Number: " TextWrapping="Wrap" VerticalAlignment="Center" Margin="16,16,16,16"/>
-                    <TextBox Name="serialNumber" TextWrapping="Wrap" VerticalAlignment="Center" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
-                    <Button Name="search_button" Content="Search" Width="100" Click="search_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,16,16,16" />
-                </StackPanel>
-                <StackPanel Name="stack2" Orientation="Horizontal" HorizontalAlignment="Left" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto">
-                    <StackPanel Name="stack3">
-                        <TextBlock Text="Model:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Text="Specifications and system run:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Text="Invoice Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Text="Delivery Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Text="Credit Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                <StackPanel Name="stack0" HorizontalAlignment="Center" Margin="16,16,16,16" >
+                        <StackPanel Orientation="Horizontal" Name="search">
+                            <TextBlock Text="Search by: " TextWrapping="Wrap" VerticalAlignment="Center" Margin="16,16,16,16"/>
+                            <ComboBox Margin="16,16,16,16"  Width="100" Name="SearchOption" SelectionChanged="SearchOption_SelectionChanged" SelectedItem="SearchSelected">
+                                <ComboBoxItem Content="Serial No."/>
+                                <ComboBoxItem Content="Model"/>
+                            </ComboBox>
+                            <TextBox Name="serialNumber" TextWrapping="Wrap" VerticalAlignment="Center" BorderThickness="2" Width="150" Margin="16,16,16,16"></TextBox>
+                        <ComboBox Name="ModelsAvailable" ItemsSource="{x:Bind ModelList}" IsEditable="True" Margin="16,16,16,16" Width="150" SelectedItem="SelectedModel"/>
+                            <Button Name="search_button" Content="Search" Width="100" Click="search_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,16,16,16" />
+                        </StackPanel>
+                    <StackPanel Name="SearchByModel">
+                        <controls:DataGrid x:Name="dataGrid"
+                                               Height="100" Width="400" Margin="12"
+    AutoGenerateColumns="True"
+    ItemsSource="{x:Bind DeviceList}">
 
-                    </StackPanel>
-                        <StackPanel Name="stack4">
-                        <TextBlock Name="model" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Name="specsNsystem" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Name="invoiceNo" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Name="deliveryNo" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBlock Name="creditNo" Width="150" Margin="16,16,16,16"></TextBlock>
+                            </controls:DataGrid>
+                        </StackPanel>
+                            <StackPanel Name="SearchBySN" Visibility="Visible" Orientation="Horizontal" HorizontalAlignment="Left" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto">
+                                <StackPanel Name="stack3">
+                                    <TextBlock Text="Model:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Text="Specifications and system run:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Text="Invoice Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Text="Delivery Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Text="Credit Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
 
-                    </StackPanel>
-               </StackPanel>
-                <StackPanel HorizontalAlignment="Center">
+                                </StackPanel>
+                                <StackPanel Name="stack4">
+                                    <TextBlock Name="model" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Name="specsNsystem" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Name="invoiceNo" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Name="deliveryNo" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                                    <TextBlock Name="creditNo" Width="150" Margin="16,16,16,16"></TextBlock>
+
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Center" Name="notes">
                     <Button Name="invoice_button" Content="Load Invoice" Width="150" Click="invoice_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
                     <Button Name="delivery_button" Content="Load Delivery" Width="150" Click="delivery_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
                     <Button Name="credit_button" Content="Load Credit" Width="150" Click="credit_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
@@ -49,13 +63,22 @@
             </StackPanel>
 
                 <StackPanel Name="stack1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Border Width="2" BorderBrush="Black">
-                        <Image Name="noteDisplay" Height="594" Width="420" Visibility="Visible" />
-                        </Border>
+                    <Image Name="noteDisplay" Height="594" Width="420" Visibility="Visible" />
+                    <!--
+                    <CommandBar x:Name="AppBar"
+                    Canvas.ZIndex="3"
+                    Background="Transparent"
+                    VerticalAlignment="Bottom">
+
+                    <AppBarButton Name="CmdDownload" x:Uid="CmdDownload" Label="download" Icon="Download" Tapped="CmdDownload_Tapped"/>
+                    </CommandBar>
+                    -->
+                
                 </StackPanel>
-
-
+                
         </StackPanel>
         </StackPanel>
+
+
     </Grid>
 </Page>

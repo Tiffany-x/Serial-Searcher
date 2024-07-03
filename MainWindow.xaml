@@ -12,6 +12,7 @@
         <NavigationView x:Name="mainNavView"
                      Loaded="mainNavView_Loaded" 
                      ItemInvoked="mainNavView_ItemInvoked"
+                        IsBackButtonVisible="Collapsed"
             PaneDisplayMode="Top" PaneTitle="Serial Searcher">
 
             <NavigationView.MenuItems>

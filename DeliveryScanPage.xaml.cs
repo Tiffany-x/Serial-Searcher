@@ -37,6 +37,9 @@ namespace SerialSearcher
             stack0.Width = Window.Current.Bounds.Width * 0.9;
             stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
             stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
+            deliDate.MaxDate = DateTime.Now;
+
+
             deliNo.Text = deliveryNumber;
             if (deliveryDate != null)
             {
@@ -59,6 +62,12 @@ namespace SerialSearcher
             scannerWatcher.Start();
             NotificationTextBlock.Text = "Starting scanner watcher...";
             System.Diagnostics.Debug.WriteLine("Starting scanner watcher...");
+        }
+
+        private void clearData()
+        {
+            deliNo.Text = "";
+            comp.Text = "";
         }
 
         private async void OnScannerAdded(DeviceWatcher sender, DeviceInformation deviceInfo)
@@ -199,6 +208,7 @@ namespace SerialSearcher
                 }
                 saveDetails((DateTimeOffset)deliDate.Date);
                 System.Diagnostics.Debug.WriteLine(deliDate.Date);
+                clearData();
                 Frame.Navigate(typeof(CreditScanPage));
             }
         }

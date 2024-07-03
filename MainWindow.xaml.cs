@@ -37,7 +37,7 @@ namespace SerialSearcher
             // If navigation occurs on SelectionChanged, this isn't needed.
             // Because we use ItemInvoked to navigate, we need to call Navigate
             // here to load the home page.
-            mainNavView_Navigate(typeof(CreditScanPage), new EntranceNavigationTransitionInfo());
+            mainNavView_Navigate(typeof(InvoiceScanPage), new EntranceNavigationTransitionInfo());
         }
 
         private void mainNavView_ItemInvoked(NavigationView sender,
@@ -47,7 +47,7 @@ namespace SerialSearcher
             switch (section.Name)
             {
                 case "navItem_addDevicePage":
-                    ContentFrame.Navigate(typeof(CreditScanPage));
+                    ContentFrame.Navigate(typeof(InvoiceScanPage));
                     break;
                 case "navItem_searchDevicePage":
                     ContentFrame.Navigate(typeof(SearchDevice));

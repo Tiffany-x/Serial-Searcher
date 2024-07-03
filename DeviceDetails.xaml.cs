@@ -33,10 +33,7 @@ namespace SerialSearcher
             deliNo.Text = DeliveryScanPage.deliveryNumber;
             credNo.Text = CreditScanPage.creditNumber;
 
-            if (reps == CreditScanPage.devices)
-            {
-                Save.Content = "Save All";
-            }
+            
 
                     
 
@@ -59,7 +56,7 @@ namespace SerialSearcher
         {
             if (reps == CreditScanPage.devices)
             {
-                
+                Save.Content = "Save All";
                 saveDetails(serialNo.Text, modelName.Text, specs.Text, systemInstall.Text);
 
                 devices[reps - 1] = new Dictionary<string, string>
@@ -82,8 +79,8 @@ namespace SerialSearcher
                     saveAllConn.Open();
 
                     SqlCommand invoiceQuery = new SqlCommand(
-        "INSERT INTO invoice(invoiceNo, invoiceDate, company, LPONumber, createdAt, docImage) " +
-        "VALUES(@invNo, @invDate, @company, @LPONum, @createdAt, @invPath)", saveAllConn);
+        "INSERT INTO invoice(invoiceNo, invoiceDate, company, createdAt, docImage) " +
+        "VALUES(@invNo, @invDate, @company, @createdAt, @invPath)", saveAllConn);
 
                     invoiceQuery.CommandType = System.Data.CommandType.Text;
 
@@ -93,29 +90,51 @@ namespace SerialSearcher
 
                     invoiceQuery.Parameters.AddWithValue("@company", InvoiceScanPage.company);
 
-                    invoiceQuery.Parameters.AddWithValue("@LPONum", InvoiceScanPage.LPONumber);
 
                     invoiceQuery.Parameters.AddWithValue("@createdAt", DateTime.Now);
 
                     invoiceQuery.Parameters.AddWithValue("@invPath", InvoiceScanPage.invoicePath);
 
-                    SqlCommand deliveryQuery = new SqlCommand(
-        "INSERT INTO delivery(deliveryNo, invoiceDate, company, LPONumber, createdAt, docImage) " +
-        "VALUES(@deliNo, @invDate, @company, @LPONum, @createdAt, @deliPath)", saveAllConn);
+                    SqlCommand deliveryQuery;
 
-                    deliveryQuery.CommandType = System.Data.CommandType.Text;
+                    if (InvoiceScanPage.sameDeli)
+                    {
+                        deliveryQuery = new SqlCommand(
+        "INSERT INTO delivery(deliveryNo, invoiceDate, company, createdAt, docImage) " +
+        "VALUES(@deliNo, @invDate, @company, @createdAt, @deliPath)", saveAllConn);
 
-                    deliveryQuery.Parameters.AddWithValue("@deliNo", DeliveryScanPage.deliveryNumber);
+                        deliveryQuery.CommandType = System.Data.CommandType.Text;
 
-                    deliveryQuery.Parameters.AddWithValue("@invDate", DeliveryScanPage.deliveryDate);
+                        deliveryQuery.Parameters.AddWithValue("@deliNo", DeliveryScanPage.deliveryNumber);
 
-                    deliveryQuery.Parameters.AddWithValue("@company", InvoiceScanPage.company);
+                        deliveryQuery.Parameters.AddWithValue("@invDate", InvoiceScanPage.invoiceDate);
 
-                    deliveryQuery.Parameters.AddWithValue("@LPONum", InvoiceScanPage.LPONumber);
+                        deliveryQuery.Parameters.AddWithValue("@company", InvoiceScanPage.company);
 
-                    deliveryQuery.Parameters.AddWithValue("@createdAt", DateTime.Now);
+                        deliveryQuery.Parameters.AddWithValue("@createdAt", DateTime.Now);
 
-                    deliveryQuery.Parameters.AddWithValue("@deliPath", DeliveryScanPage.deliPath);
+                        deliveryQuery.Parameters.AddWithValue("@deliPath", InvoiceScanPage.invoicePath);
+
+                    }
+                    else
+                    {
+                        deliveryQuery = new SqlCommand(
+        "INSERT INTO delivery(deliveryNo, invoiceDate, company, createdAt, docImage) " +
+        "VALUES(@deliNo, @invDate, @company, @createdAt, @deliPath)", saveAllConn);
+
+                        deliveryQuery.CommandType = System.Data.CommandType.Text;
+
+                        deliveryQuery.Parameters.AddWithValue("@deliNo", DeliveryScanPage.deliveryNumber);
+
+                        deliveryQuery.Parameters.AddWithValue("@invDate", DeliveryScanPage.deliveryDate);
+
+                        deliveryQuery.Parameters.AddWithValue("@company", InvoiceScanPage.company);
+
+                        deliveryQuery.Parameters.AddWithValue("@createdAt", DateTime.Now);
+
+                        deliveryQuery.Parameters.AddWithValue("@deliPath", DeliveryScanPage.deliPath);
+
+                    }
 
 
                     SqlCommand creditQuery = new SqlCommand(
@@ -132,14 +151,20 @@ namespace SerialSearcher
 
                     creditQuery.Parameters.AddWithValue("@createdAt", DateTime.Now);
 
-                    creditQuery.Parameters.AddWithValue("@credPath", DeliveryScanPage.deliPath);
+                    creditQuery.Parameters.AddWithValue("@credPath", CreditScanPage.creditPath);
+
+                    invoiceQuery.ExecuteNonQuery();
+                    deliveryQuery.ExecuteNonQuery();
+                    creditQuery.ExecuteNonQuery();
 
                     SqlCommand deviceQuery;
 
-                    
-
                     for (int i = 0; i < devices.Length; i++)
                     {
+                        if (reps == CreditScanPage.devices)
+                        {
+                            Save.Content = "Save All";
+                        }
                         // Create a new SqlCommand for each device to avoid parameter conflicts
                         using (deviceQuery = new SqlCommand(
                             "INSERT INTO device(deviceType, model, serialNo, specsNsystem, invoiceNo, deliveryNo, creditNo, createdAt) " +
@@ -172,19 +197,16 @@ namespace SerialSearcher
                             // Execute the query
                             try
                             {
-                                invoiceQuery.ExecuteNonQuery();
-                                deliveryQuery.ExecuteNonQuery();
-                                creditQuery.ExecuteNonQuery();
+                                
                                 deviceQuery.ExecuteNonQuery();
                                 ShowToastNotification("Success", "Device has been recorded.");
                                 clearAll();
-                                Save.Content = "Save All";
                             }
                             catch (Exception ex)
                             {
                                 // Display specific error message
-                                error("Error: " + ex.Message);
-                                System.Diagnostics.Debug.WriteLine(ex.Message);
+                                //error("Error: " + ex.Message);
+                                System.Diagnostics.Debug.WriteLine("Not recorded: " +ex.Message);
                             }
                         }
                     }
@@ -202,7 +224,6 @@ namespace SerialSearcher
                         saveAllConn.Close();
                     }
                 }
-
                 Frame.Navigate(typeof(InvoiceScanPage));
                 return;
             } else if (reps < CreditScanPage.devices)
@@ -227,10 +248,11 @@ namespace SerialSearcher
                     };
 
                     System.Diagnostics.Debug.WriteLine(deviceType);
+                    clearAll();
+                    reps++;
+                    label.Text = reps + " out of " + CreditScanPage.devices;
                 }
-                clearAll();
-                reps++;
-                label.Text = reps + " out of " + CreditScanPage.devices;
+                
             }
 
         }
@@ -290,18 +312,25 @@ namespace SerialSearcher
                 {
                     systemInstall.Visibility = Visibility.Visible;
                     systInstall.Visibility = Visibility.Visible;
+                    Specifications.Visibility = Visibility.Visible;
+                    specs.Visibility = Visibility.Visible;
+
                 }
                 else if (deviceType != "Desktop" || deviceType != "Laptop")
                 {
                     systemInstall.Visibility = Visibility.Collapsed;
                     systInstall.Visibility = Visibility.Collapsed;
+                    Specifications.Visibility = Visibility.Collapsed;
+                    specs.Visibility = Visibility.Collapsed;
                 }
             }
             
         }
 
+        
         private void clearAll()
         {
+
             DeviceCombo.SelectedIndex = -1;
             serialNo.Text = "";
             modelName.Text = "";

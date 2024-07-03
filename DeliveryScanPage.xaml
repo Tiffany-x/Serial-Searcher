@@ -22,11 +22,11 @@
                     <Button Content="View Scan" Click="GetScanButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,16,16,16"/>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Delivery Number:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBox Name="deliNo" IsEnabled="False" BorderThickness="2" Width="150" Margin="16,16,16,16"></TextBox>
+                        <TextBox Name="deliNo" BorderThickness="2" Width="150" Margin="16,16,16,16"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Delivery Date:" TextWrapping="Wrap" Width="100" Margin="16,16,16,16"></TextBlock>
-                        <DatePicker Name="deliDate" Margin="16,16,16,16"/>
+                        <CalendarDatePicker Name="deliDate" Margin="16,16,16,16" Width="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Company:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>

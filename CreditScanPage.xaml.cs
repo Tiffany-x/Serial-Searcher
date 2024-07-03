@@ -46,6 +46,8 @@ namespace SerialSearcher
             stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
             stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
             credNo.Text = creditNumber;
+
+            invDate.MaxDate = DateTime.Now;
             invDate.Date = InvoiceScanPage.invoiceDate;
 
 
@@ -149,7 +151,10 @@ namespace SerialSearcher
         }
 
 
-
+        private void clearData()
+        {
+            credNo.Text = "";
+        }
         private void cancelScanButton_Click(object sender, RoutedEventArgs e)
         {
             // Clear the displayed image and disable save and cancel buttons
@@ -174,7 +179,8 @@ namespace SerialSearcher
 
         private async void nextButton_Click(object sender, RoutedEventArgs e)
         {
-            /*string name = creditNumber + ".jpg";
+            creditNumber = credNo.Text;
+            string name = creditNumber + ".jpg";
             try
             {
                 string folderName = "Credit Notes";
@@ -199,12 +205,14 @@ namespace SerialSearcher
                 if (result == ContentDialogResult.Primary)
                 {
                     System.Diagnostics.Debug.WriteLine("cancelled");
-                    
-                } else if (result == ContentDialogResult.Secondary)
+                    dialog1.Hide();
+                }
+                else if (result == ContentDialogResult.Secondary)
                 {
                     devices = Int32.Parse(dialog1.Text);
+                    clearData();
                     Frame.Navigate(typeof(DeviceDetails), devices);
-
+                    dialog1.Hide();
                 }
 
 
@@ -214,21 +222,10 @@ namespace SerialSearcher
             {
                 // Log or display the exception message
                 System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
-            }*/
-            var dialog1 = new DeviceRequest();
-            var result = await dialog1.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                System.Diagnostics.Debug.WriteLine("cancelled");
-                dialog1.Hide();
             }
-            else if (result == ContentDialogResult.Secondary)
-            {
-                devices = Int32.Parse(dialog1.Text);
-                Frame.Navigate(typeof(DeviceDetails), devices);
-                dialog1.Hide();
 
-            }
+
+            
 
         }
         
@@ -258,20 +255,6 @@ namespace SerialSearcher
             
         }
 
-        public static void ClearAll()
-        {
-            DeviceDetails.deviceType = "";
-            DeviceDetails.SerialNumber = "";
-            DeviceDetails.model = "";
-            DeviceDetails.specifications = "";
-            DeviceDetails.system = "";
-            InvoiceScanPage.invoiceNumber = "";
-            DeliveryScanPage.deliveryNumber = "";
-            CreditScanPage.creditNumber = "";
-            InvoiceScanPage.sameDeli = false;
-            InvoiceScanPage.company = "";
-            InvoiceScanPage.LPONumber = "";
-        }
 
         
     }
