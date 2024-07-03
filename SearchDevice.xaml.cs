@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.UI.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -20,8 +24,8 @@ namespace SerialSearcher
     {
         public string connectionString = @"Data Source = SPARE3-DIT\SQLEXPRESS; Initial Catalog = serial_searcher; Integrated Security = true;";
         List<Models> ModelList = new List<Models>();
-        List<Devices> DeviceList = new List<Devices>();
         HashSet<string> modelDescriptions = new HashSet<string>();
+        public DataTable dataTable;
 
         public SearchDevice()
         {
@@ -193,7 +197,8 @@ namespace SerialSearcher
                 {
                     searchConn.Close();
                 }
-            } else
+            }
+            else
             {
                 string selected = ((Models)ModelsAvailable.SelectedItem).ToString();
                 System.Diagnostics.Debug.WriteLine(selected);
@@ -202,50 +207,50 @@ namespace SerialSearcher
 
                 try
                 {
-                    deviceConn = new SqlConnection(connectionString);
-
-                    deviceConn.Open();
-
-                    SqlCommand modelQuery = new SqlCommand("SELECT serialNo, invoiceNo FROM device WHERE model = @model", deviceConn);
-
-                    modelQuery.Parameters.AddWithValue("@model", selected);
-                    reader = modelQuery.ExecuteReader();
-                    if (reader.HasRows)
+                    using (deviceConn = new SqlConnection(connectionString))
                     {
-                        while (reader.Read())
+                        deviceConn.Open();
+
+                        var command = deviceConn.CreateCommand();
+                        command.CommandText = "SELECT serialNo, invoiceNo FROM device WHERE model = @model";
+                        command.Parameters.AddWithValue("@model", selected);
+                        DataTable dataTable = new DataTable();
+                        using (var dataAdapter = new SqlDataAdapter(command))
                         {
-                            System.Diagnostics.Debug.WriteLine("a device");
-                            string SN = reader["serialNo"].ToString();
-                            string IN = reader["invoiceNo"].ToString();
-
-
-
-                            // Add the new Models object to the ModelList
-                            DeviceList.Add(new Devices
-                            {
-                                serialNumber = SN,
-                                    invoiceDate = IN
-                            });
-                            }
-
+                            dataAdapter.Fill(dataTable);
+                        }
                     }
 
+                    // Clear the DataGrid
+                    DeviceGrid.ItemsSource = null;
+
+                    // Create a collection of Device objects to use as the ItemsSource
+                    var deviceList = new ObservableCollection<Devices>();
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        var device = new Devices
+                        {
+                            SerialNo = row["serialNo"].ToString(),
+                            InvoiceNo = row["invoiceNo"].ToString()
+                        };
+                        deviceList.Add(device);
+                    }
+                    DeviceGrid.ItemsSource = deviceList;
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions as needed
+                    System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
                 }
                 finally
                 {
-                    // close reader
-                    if (reader != null)
-                    {
-                        reader.Close();
-                    }
-
-                    // close connection
-
+                    reader?.Close();
                 }
+
             }
-                
         }
-        private async void noDevice()
+
+            private async void noDevice()
         {
             ContentDialog error = new ContentDialog()
             {

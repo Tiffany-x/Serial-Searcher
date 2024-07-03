@@ -6,25 +6,25 @@ using System.Threading.Tasks;
 
 namespace SerialSearcher
 {
-    class Devices
+    public class Devices
     {
-        public string serialNumber
+        public string SerialNo
         {
             get;
             set;
         }
-        public string invoiceDate
+        public string InvoiceNo
         {
             get;
             set;
         }
-        public string serial()
+        public string Serial()
         {
-            return this.serialNumber;
+            return this.SerialNo;
         }
-        public string invoice()
+        public string Invoice()
         {
-            return this.invoiceDate;
+            return this.InvoiceNo;
         }
     }
 }
