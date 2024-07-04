@@ -38,23 +38,7 @@ namespace SerialSearcher
         public InvoiceScanPage()
         {
             this.InitializeComponent();
-            mainStack.Width = Window.Current.Bounds.Width * 0.9;
-            stack0.Width = Window.Current.Bounds.Width * 0.9;
-            stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
-            stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
-            invDate.MaxDate = DateTime.Now;
-            if (sameDeli)
-            {
-                invSameDeli_Check.IsChecked = true;
-            }
-
-            if (company != null)
-            {
-                invNo.Text = invoiceNumber;
-                comp.Text = company;
-                invDate.Date = invoiceDate;
-            }
-            InitDeviceWatcher();
+            
         }
 
         private void InitDeviceWatcher()
@@ -163,8 +147,7 @@ namespace SerialSearcher
                         System.Diagnostics.Debug.WriteLine("not found.");
                     }
 
-                    // Enable save and cancel buttons
-                    Next.IsEnabled = false;
+                    // Enable save and cancel button
                     cancelScanButton.IsEnabled = true;
                     Next.IsEnabled = true;
                 }
@@ -320,6 +303,40 @@ namespace SerialSearcher
             sameDeli = same;
         }
 
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            mainStack.Width = Window.Current.Bounds.Width * 0.9;
+            stack0.Width = Window.Current.Bounds.Width * 0.9;
+            stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
+            stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
+            invDate.MaxDate = DateTime.Now;
+            if (sameDeli)
+            {
+                invSameDeli_Check.IsChecked = true;
+            }
+
+            if (company != null)
+            {
+                invNo.Text = invoiceNumber;
+                comp.Text = company;
+                invDate.Date = invoiceDate;
+                StorageFile imageFile = await StorageFile.GetFileFromPathAsync(invoicePath);
+                using (IRandomAccessStream fileStream = await imageFile.OpenAsync(FileAccessMode.Read))
+                {
+                    // Create a BitmapImage
+                    BitmapImage bitmapImage = new BitmapImage();
+
+                    // Set the source of the BitmapImage to the stream
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    // Set the image control's source to the BitmapImage
+                    ScannedImage.Source = bitmapImage;
+                    Next.IsEnabled = true;
+                }
+
+            }
+            InitDeviceWatcher();
+        }
     }
 
 }

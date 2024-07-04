@@ -15,32 +15,41 @@
 
             <StackPanel Name="mainStack" Orientation="Horizontal" >
 
-                <StackPanel Name="stack0" HorizontalAlignment="Center" Margin="16,16,16,16" >
+                <StackPanel Name="stack0" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Name="search">
-                        <TextBlock Text="Search by: " TextWrapping="Wrap" VerticalAlignment="Center" Margin="16,16,16,16"/>
-                        <ComboBox Margin="16,16,16,16"  Width="100" Name="SearchOption" SelectionChanged="SearchOption_SelectionChanged" SelectedItem="SearchSelected">
+                        <TextBlock Text="Search by:" TextWrapping="Wrap" VerticalAlignment="Center" Margin="16,16,16,16"/>
+                        <ComboBox Margin="5,16,5,16"  Width="100" Name="SearchOption" SelectionChanged="SearchOption_SelectionChanged" SelectedItem="SearchSelected">
                             <ComboBoxItem Content="Serial No."/>
                             <ComboBoxItem Content="Model"/>
                         </ComboBox>
-                        <TextBox Name="serialNumber" TextWrapping="Wrap" VerticalAlignment="Center" BorderThickness="2" Width="150" Margin="16,16,16,16"></TextBox>
-                        <ComboBox Name="ModelsAvailable" Visibility="Collapsed" ItemsSource="{x:Bind ModelList}" IsEditable="True" Margin="16,16,16,16" Width="150" SelectedItem="SelectedModel"/>
+                        <TextBox Name="serialNumber" TextWrapping="Wrap" VerticalAlignment="Center" BorderThickness="2" Width="150" Margin="5,16,16,16"></TextBox>
+                        <ComboBox Name="ModelsAvailable" Visibility="Collapsed" SelectionChanged="ModelsAvailable_SelectionChanged" ItemsSource="{x:Bind ModelList}" IsEditable="True" Margin="16,16,16,16" Width="150" SelectedItem="SelectedModel"/>
                         <Button Name="search_button" Content="Search" Width="100" Click="search_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,16,16,16" />
                     </StackPanel>
+                    <StackPanel Name="details" >
                     <StackPanel Name="SearchByModel">
-                        <controls:DataGrid Name="DeviceGrid"
-                                           Width="400"
-                                           Height="150"
+                        <controls:DataGrid 
+                            HorizontalScrollBarVisibility="Hidden"
+                            SelectionChanged="DeviceGrid_SelectionChanged"
+                            Name="DeviceGrid"
+                                           Width="200"
+                                           ColumnWidth="100"
+                                           Height="auto"
+                                           MaxHeight="200"
                                            HeadersVisibility="Column"
+                            IsDoubleTapEnabled="False"
                     CanUserSortColumns="True"
                     BorderThickness="2"
-                    BorderBrush="DarkSlateGray"
+                    BorderBrush="Black"
                     Foreground="black"
                     GridLinesVisibility="All"
                     AutoGenerateColumns="False"
-                    SelectionMode="Single">
+                    SelectionMode="Extended"
+                            Margin="20, 20, 20, 20"
+                                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Header="Serial No" Binding="{Binding SerialNo}" />
-                                <controls:DataGridTextColumn Header="Invoice No" Binding="{Binding InvoiceNo}" />
+                                <controls:DataGridTextColumn Foreground="Black" Header="Serial No" Binding="{Binding SerialNo}" />
+                                <controls:DataGridTextColumn Foreground="Black" Header="Invoice No" Binding="{Binding InvoiceNo}" />
                             </controls:DataGrid.Columns>
                         </controls:DataGrid>
                     </StackPanel>
@@ -62,10 +71,11 @@
 
                         </StackPanel>
                     </StackPanel>
-                    <StackPanel HorizontalAlignment="Center" Name="notes">
-                        <Button Name="invoice_button" Content="Load Invoice" Width="150" Click="invoice_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
-                        <Button Name="delivery_button" Content="Load Delivery" Width="150" Click="delivery_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
-                        <Button Name="credit_button" Content="Load Credit" Width="150" Click="credit_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,20,50,20" />
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Name="notes">
+                        <Button Name="invoice_button" Content="Load Invoice" Width="120" Click="invoice_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,32,16,16" />
+                        <Button Name="delivery_button" Content="Load Delivery" Width="120" Click="delivery_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,32,16,16" />
+                        <Button Name="credit_button" Content="Load Credit" Width="120" Click="credit_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,32,16,16" />
 
                     </StackPanel>
 

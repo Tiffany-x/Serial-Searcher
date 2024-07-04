@@ -135,7 +135,6 @@ namespace SerialSearcher
                     ScannedImage.Source = bitmapSource;
 
                     // Enable save and cancel buttons
-                    Next.IsEnabled = true;
                     cancelScanButton.IsEnabled = true;
                     Next.IsEnabled = true;
                 }
@@ -216,6 +215,27 @@ namespace SerialSearcher
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(InvoiceScanPage));
+        }
+
+        private async void Page_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            
+            if (deliveryDate != null)
+            {
+                StorageFile imageFile = await StorageFile.GetFileFromPathAsync(deliPath);
+                using (IRandomAccessStream fileStream = await imageFile.OpenAsync(FileAccessMode.Read))
+                {
+                    // Create a BitmapImage
+                    BitmapImage bitmapImage = new BitmapImage();
+
+                    // Set the source of the BitmapImage to the stream
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    // Set the image control's source to the BitmapImage
+                    ScannedImage.Source = bitmapImage;
+                    Next.IsEnabled = true;
+                }
+            }
         }
 
         public static DateTimeOffset deliveryDate;

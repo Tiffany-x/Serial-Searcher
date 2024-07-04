@@ -26,15 +26,19 @@ namespace SerialSearcher
         List<Models> ModelList = new List<Models>();
         HashSet<string> modelDescriptions = new HashSet<string>();
         public DataTable dataTable;
+        ObservableCollection<Devices> deviceList;
 
         public SearchDevice()
         {
             this.InitializeComponent();
-       
+
+            DeviceGrid.IsReadOnly = true;
             search.Width = Window.Current.Bounds.Width / 2;
             notes.Width = Window.Current.Bounds.Width / 2;
             stack0.Width = Window.Current.Bounds.Width / 2;
             stack1.Width = Window.Current.Bounds.Width / 2;
+            details.Width = Window.Current.Bounds.Width / 2;
+            notes.Width = Window.Current.Bounds.Width / 2;
             SearchByModel.Width = Window.Current.Bounds.Width / 2;
             SearchBySN.Width = Window.Current.Bounds.Width / 2;
             stack3.Width = Window.Current.Bounds.Width / 4;
@@ -99,158 +103,111 @@ namespace SerialSearcher
 
         private void search_button_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            if (SearchOption.SelectedIndex == 0)
+            FetchData(serialNumber.Text);
+                
+        }
+
+        private void FetchData(string device)
+        {
+            SqlConnection searchConn = null;
+            SqlDataReader reader = null;
+            SqlDataReader invoiceReader;
+            SqlDataReader deliveryReader;
+            SqlDataReader creditReader;
+
+
+            try
             {
-                SqlConnection searchConn = null;
-                SqlDataReader reader = null;
-                SqlDataReader invoiceReader;
-                SqlDataReader deliveryReader;
-                SqlDataReader creditReader;
+                searchConn = new SqlConnection(connectionString);
 
+                searchConn.Open();
 
-                try
+                SqlCommand searchQuery = new SqlCommand(
+    "select deviceType, model, specsNsystem, invoiceNo, deliveryNo, creditNo from device where serialNo = @serialNo", searchConn);
+                searchQuery.Parameters.AddWithValue("@serialNo", device);
+
+                reader = searchQuery.ExecuteReader();
+                if (reader.HasRows)
                 {
-                    searchConn = new SqlConnection(connectionString);
-
-                    searchConn.Open();
-
-                    SqlCommand searchQuery = new SqlCommand(
-        "select deviceType, model, specsNsystem, invoiceNo, deliveryNo, creditNo from device where serialNo = @serialNo", searchConn);
-                    searchQuery.Parameters.AddWithValue("@serialNo", serialNumber.Text);
-
-                    reader = searchQuery.ExecuteReader();
-                    if (reader.HasRows)
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            model.Text = reader["model"].ToString();
-                            specsNsystem.Text = reader["specsNsystem"].ToString();
-                            invoiceNo.Text = reader["invoiceNo"].ToString();
-                            deliveryNo.Text = reader["deliveryNo"].ToString();
-                            creditNo.Text = reader["creditNo"].ToString();
-                        }
+                        model.Text = reader["model"].ToString();
+                        specsNsystem.Text = reader["specsNsystem"].ToString();
+                        invoiceNo.Text = reader["invoiceNo"].ToString();
+                        deliveryNo.Text = reader["deliveryNo"].ToString();
+                        creditNo.Text = reader["creditNo"].ToString();
                     }
-                    else
-                    {
-                        noDevice();
-                    }
-                }
-                finally
-                {
-                    // close reader
-                    if (reader != null)
-                    {
-                        reader.Close();
-                    }
-
-                    // close connection
-
-                }
-
-                SqlCommand invoiceQuery = new SqlCommand(
-        "SELECT docImage FROM invoice where invoiceNo = @invNo", searchConn);
-                invoiceQuery.Parameters.AddWithValue("@invNo", invoiceNo.Text);
-
-                invoiceReader = invoiceQuery.ExecuteReader();
-                if (invoiceReader.HasRows)
-                {
-                    while (invoiceReader.Read())
-                    {
-                        invoicePath = invoiceReader["docImage"].ToString();
-
-                    }
-                }
-                invoiceReader.Close();
-
-                if (invoiceNo.Text == deliveryNo.Text)
-                {
-                    deliveryPath = invoicePath;
                 }
                 else
                 {
-                    SqlCommand deliveryQuery = new SqlCommand(
-        "SELECT docImage FROM delivery where deliveryNo = @deliNo", searchConn);
-                    deliveryQuery.Parameters.AddWithValue("@deliNo", deliveryNo.Text);
-                    deliveryReader = deliveryQuery.ExecuteReader();
-                    if (deliveryReader.HasRows)
-                    {
-                        while (deliveryReader.Read())
-                        {
-                            deliveryPath = deliveryReader["docImage"].ToString();
-                        }
-                    }
-                    deliveryReader.Close();
+                    noDevice();
                 }
-                SqlCommand creditQuery = new SqlCommand(
-    "SELECT docImage FROM credit where creditNo = @credNo", searchConn);
-                creditQuery.Parameters.AddWithValue("@credNo", creditNo.Text);
-                creditReader = creditQuery.ExecuteReader();
-                if (creditReader.HasRows)
+            }
+            finally
+            {
+                // close reader
+                if (reader != null)
                 {
-                    while (creditReader.Read())
-                    {
-                        creditPath = creditReader["docImage"].ToString();
-                    }
+                    reader.Close();
                 }
-                creditReader.Close();
-                if (searchConn != null)
+
+                // close connection
+
+            }
+
+            SqlCommand invoiceQuery = new SqlCommand(
+    "SELECT docImage FROM invoice where invoiceNo = @invNo", searchConn);
+            invoiceQuery.Parameters.AddWithValue("@invNo", invoiceNo.Text);
+
+            invoiceReader = invoiceQuery.ExecuteReader();
+            if (invoiceReader.HasRows)
+            {
+                while (invoiceReader.Read())
                 {
-                    searchConn.Close();
+                    invoicePath = invoiceReader["docImage"].ToString();
+
                 }
+            }
+            invoiceReader.Close();
+
+            if (invoiceNo.Text == deliveryNo.Text)
+            {
+                deliveryPath = invoicePath;
             }
             else
             {
-                string selected = ((Models)ModelsAvailable.SelectedItem).ToString();
-                System.Diagnostics.Debug.WriteLine(selected);
-                SqlConnection deviceConn;
-                SqlDataReader reader = null;
-
-                try
+                SqlCommand deliveryQuery = new SqlCommand(
+    "SELECT docImage FROM delivery where deliveryNo = @deliNo", searchConn);
+                deliveryQuery.Parameters.AddWithValue("@deliNo", deliveryNo.Text);
+                deliveryReader = deliveryQuery.ExecuteReader();
+                if (deliveryReader.HasRows)
                 {
-                    using (deviceConn = new SqlConnection(connectionString))
+                    while (deliveryReader.Read())
                     {
-                        deviceConn.Open();
-
-                        var command = deviceConn.CreateCommand();
-                        command.CommandText = "SELECT serialNo, invoiceNo FROM device WHERE model = @model";
-                        command.Parameters.AddWithValue("@model", selected);
-                        DataTable dataTable = new DataTable();
-                        using (var dataAdapter = new SqlDataAdapter(command))
-                        {
-                            dataAdapter.Fill(dataTable);
-                        }
+                        deliveryPath = deliveryReader["docImage"].ToString();
                     }
-
-                    // Clear the DataGrid
-                    DeviceGrid.ItemsSource = null;
-
-                    // Create a collection of Device objects to use as the ItemsSource
-                    var deviceList = new ObservableCollection<Devices>();
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        var device = new Devices
-                        {
-                            SerialNo = row["serialNo"].ToString(),
-                            InvoiceNo = row["invoiceNo"].ToString()
-                        };
-                        deviceList.Add(device);
-                    }
-                    DeviceGrid.ItemsSource = deviceList;
                 }
-                catch (Exception ex)
-                {
-                    // Handle exceptions as needed
-                    System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
-                }
-                finally
-                {
-                    reader?.Close();
-                }
-
+                deliveryReader.Close();
             }
-        }
+            SqlCommand creditQuery = new SqlCommand(
+"SELECT docImage FROM credit where creditNo = @credNo", searchConn);
+            creditQuery.Parameters.AddWithValue("@credNo", creditNo.Text);
+            creditReader = creditQuery.ExecuteReader();
+            if (creditReader.HasRows)
+            {
+                while (creditReader.Read())
+                {
+                    creditPath = creditReader["docImage"].ToString();
+                }
+            }
+            creditReader.Close();
+            if (searchConn != null)
+            {
+                searchConn.Close();
+            }
 
-            private async void noDevice()
+        }
+        private async void noDevice()
         {
             ContentDialog error = new ContentDialog()
             {
@@ -308,14 +265,107 @@ namespace SerialSearcher
                 SearchByModel.Visibility = Visibility.Collapsed;
             } else
             {
+                search_button.Visibility = Visibility.Collapsed;
                 ModelsAvailable.Visibility = Visibility.Visible;
                 serialNumber.Visibility = Visibility.Collapsed;
                 SearchByModel.Visibility = Visibility.Visible;
-                SearchBySN.Visibility = Visibility.Collapsed;
+                SearchBySN.Visibility = Visibility.Visible;
             }
         }
 
+        private void ModelsAvailable_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string selected = ((Models)ModelsAvailable.SelectedItem)?.ToString();
+            if (selected == null)
+            {
+                System.Diagnostics.Debug.WriteLine("No model selected.");
+                return;
+            }
+
+            System.Diagnostics.Debug.WriteLine("Selected model: " + selected);
+
+            SqlConnection deviceConn = null;
+            SqlDataReader reader = null;
+
+            try
+            {
+                using (deviceConn = new SqlConnection(connectionString))
+                {
+                    deviceConn.Open();
+                    System.Diagnostics.Debug.WriteLine("Database connection opened.");
+
+                    var command = deviceConn.CreateCommand();
+                    command.CommandText = "SELECT serialNo, invoiceNo FROM device WHERE model = @model";
+                    command.Parameters.AddWithValue("@model", selected);
+
+                    DataTable dataTable = new DataTable();
+                    using (var dataAdapter = new SqlDataAdapter(command))
+                    {
+                        dataAdapter.Fill(dataTable);
+                    }
+
+                    if (dataTable.Rows.Count == 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("No data found for the selected model.");
+                        return;
+                    }
+
+                    System.Diagnostics.Debug.WriteLine("Data retrieved successfully.");
+
+                    // Clear the DataGrid
+                    DeviceGrid.ItemsSource = null;
+
+                    // Create a collection of Device objects to use as the ItemsSource
+                    deviceList = new ObservableCollection<Devices>();
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        var device = new Devices
+                        {
+                            SerialNo = row["serialNo"].ToString(),
+                            InvoiceNo = row["invoiceNo"].ToString()
+                        };
+                        deviceList.Add(device);
+                    }
+
+                    DeviceGrid.ItemsSource = deviceList;
+                    System.Diagnostics.Debug.WriteLine("Data bound to DataGrid successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions as needed
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+                reader?.Close();
+            }
+        }
+
+        private void DeviceGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int selectedIndex = DeviceGrid.SelectedIndex;
+            selectedDevice = deviceList[selectedIndex].GetSerial();
+            System.Diagnostics.Debug.WriteLine(selectedDevice);
+            FetchData(selectedDevice);
+        }
+        string selectedDevice;
     }
 
-   
+    public class Devices
+    {
+        public string SerialNo { get; set; }
+        public string InvoiceNo { get; set; }
+
+        public string GetSerial()
+        {
+            return SerialNo;
+        }
+        public string GetInvoice()
+        {
+            return InvoiceNo;
+        }
+    }
+
+
 }

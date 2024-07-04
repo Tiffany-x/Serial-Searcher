@@ -9,6 +9,25 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <StackPanel Visibility="Visible" Orientation="Horizontal" HorizontalAlignment="Center" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto">
+            <StackPanel Name="stack3">
+                <TextBlock Text="Employee ID: " TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                <TextBlock Text="Password:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                <TextBlock Text="Privilege:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+
+            </StackPanel>
+            <StackPanel Name="stack4">
+                <TextBlock Name="empID" Width="150" Margin="16,16,16,16"></TextBlock>
+                <TextBlock Name="password" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
+                <ComboBox Name="privilegeCombo" SelectedItem="selectedPrivilege">
+                    <ComboBoxItem Content="Manager"/>
+                    <ComboBoxItem Content="User"/>
+
+                </ComboBox>
+            </StackPanel>
+            <Button Name="createUser_button" Content="Create User" Width="100" Click="create_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,16,16,16" />
+
+        </StackPanel>
 
     </Grid>
 </Page>

@@ -22,6 +22,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 
 
+
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace SerialSearcher
@@ -255,8 +256,26 @@ namespace SerialSearcher
             
         }
 
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (invDate != null)
+            {
+                StorageFile imageFile = await StorageFile.GetFileFromPathAsync(creditPath);
+                using (IRandomAccessStream fileStream = await imageFile.OpenAsync(FileAccessMode.Read))
+                {
+                    // Create a BitmapImage
+                    BitmapImage bitmapImage = new BitmapImage();
 
-        
+                    // Set the source of the BitmapImage to the stream
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    // Set the image control's source to the BitmapImage
+                    ScannedImage.Source = bitmapImage;
+                    Next.IsEnabled = true;
+
+                }
+            }
+        }
     }
 
 }
