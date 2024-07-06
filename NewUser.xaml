@@ -9,17 +9,17 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <StackPanel Visibility="Visible" Orientation="Horizontal" HorizontalAlignment="Center" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto">
-            <StackPanel Name="stack3">
+        <StackPanel Visibility="Visible" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto">
+            <StackPanel Name="stack3" VerticalAlignment="Center">
                 <TextBlock Text="Employee ID: " TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
                 <TextBlock Text="Password:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
                 <TextBlock Text="Privilege:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
 
             </StackPanel>
-            <StackPanel Name="stack4">
-                <TextBlock Name="empID" Width="150" Margin="16,16,16,16"></TextBlock>
-                <TextBlock Name="password" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                <ComboBox Name="privilegeCombo" SelectedItem="selectedPrivilege">
+            <StackPanel Name="stack4" VerticalAlignment="Center">
+                <TextBox Name="empID" Width="150" Margin="16,16,16,16"></TextBox>
+                <PasswordBox Name="password" Width="150" Margin="16,16,16,16"></PasswordBox>
+                <ComboBox Name="privilegeCombo" SelectedItem="selectedPrivilege" Width="150" Margin="16,16,16,16">
                     <ComboBoxItem Content="Manager"/>
                     <ComboBoxItem Content="User"/>
 

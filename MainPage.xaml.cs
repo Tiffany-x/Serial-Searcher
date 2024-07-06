@@ -1,6 +1,15 @@
 ﻿using System.Data.SqlClient;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.DataProtection;
+using System;
+using Windows.Storage.Streams;
+using System.Threading.Tasks;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
+using Windows.Security.Cryptography.Core;
+
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -12,6 +21,7 @@ namespace SerialSearcher
     /// 
     public sealed partial class MainPage : Page
     {
+        private string key = "bidco";
         static public string access;
         public string connectionString = @"Data Source = SPARE3-DIT\SQLEXPRESS; Initial Catalog = serial_searcher; Integrated Security = true;";
         public MainPage()
@@ -21,7 +31,37 @@ namespace SerialSearcher
 
         }
 
-        private void loginButton_Click(object sender, RoutedEventArgs e)
+        private async Task<string> DecryptStringHelper(string encryptedString, string key)
+        {
+            try
+            {
+                var hashKey = GetMD5Hash(key);
+                IBuffer decryptBuffer = CryptographicBuffer.DecodeFromBase64String(encryptedString);
+                var AES = SymmetricKeyAlgorithmProvider.OpenAlgorithm(SymmetricAlgorithmNames.AesEcbPkcs7);
+                var symmetricKey = AES.CreateSymmetricKey(hashKey);
+                var decryptedBuffer = CryptographicEngine.Decrypt(symmetricKey, decryptBuffer, null);
+                string decryptedString = CryptographicBuffer.ConvertBinaryToString(BinaryStringEncoding.Utf8, decryptedBuffer);
+                return decryptedString;
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+        }
+
+        private static IBuffer GetMD5Hash(string key)
+        {
+            IBuffer bufferUTF8Msg = CryptographicBuffer.ConvertStringToBinary(key, BinaryStringEncoding.Utf8);
+            HashAlgorithmProvider hashAlgorithmProvider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
+            IBuffer hashBuffer = hashAlgorithmProvider.HashData(bufferUTF8Msg);
+            if (hashBuffer.Length != hashAlgorithmProvider.HashLength)
+            {
+                throw new Exception("There was an error creating the hash");
+            }
+            return hashBuffer;
+        }
+
+        private async void loginButton_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine(password.Password);
             SqlConnection loginConn = null;
@@ -41,9 +81,12 @@ namespace SerialSearcher
 
                 reader = loginQuery.ExecuteReader();
 
+                
                 while (reader.Read())
                 {
-                    if (reader["password"].ToString() == password.Password)
+                    string decrypted = await DecryptStringHelper(reader["password"].ToString(), key);
+                    System.Diagnostics.Debug.WriteLine(decrypted);
+                    if (decrypted == password.Password)
                     {
                         label.Text = "Successfully logged in!";
                         access = reader["privilege"].ToString();

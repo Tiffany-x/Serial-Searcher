@@ -30,14 +30,22 @@ namespace SerialSearcher
             {
                 navItem_addDevicePage.Visibility = Visibility.Collapsed;
                 navItem_createUserPage.Visibility = Visibility.Collapsed;
+                mainNavView.SelectedItem = mainNavView.MenuItems[0];
+                // If navigation occurs on SelectionChanged, this isn't needed.
+                // Because we use ItemInvoked to navigate, we need to call Navigate
+                // here to load the home page.
+                mainNavView_Navigate(typeof(SearchDevice), new EntranceNavigationTransitionInfo());
+            } else
+            {
+                mainNavView.SelectedItem = mainNavView.MenuItems[0];
+                // If navigation occurs on SelectionChanged, this isn't needed.
+                // Because we use ItemInvoked to navigate, we need to call Navigate
+                // here to load the home page.
+                mainNavView_Navigate(typeof(InvoiceScanPage), new EntranceNavigationTransitionInfo());
             }
 
             // mainNavView doesn't load any page by default, so load home page.
-            mainNavView.SelectedItem = mainNavView.MenuItems[0];
-            // If navigation occurs on SelectionChanged, this isn't needed.
-            // Because we use ItemInvoked to navigate, we need to call Navigate
-            // here to load the home page.
-            mainNavView_Navigate(typeof(InvoiceScanPage), new EntranceNavigationTransitionInfo());
+            
         }
 
         private void mainNavView_ItemInvoked(NavigationView sender,
