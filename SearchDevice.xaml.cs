@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -33,23 +34,29 @@ namespace SerialSearcher
             this.InitializeComponent();
 
             DeviceGrid.IsReadOnly = true;
-            search.Width = Window.Current.Bounds.Width / 2;
-            notes.Width = Window.Current.Bounds.Width / 2;
-            stack0.Width = Window.Current.Bounds.Width / 2;
-            stack1.Width = Window.Current.Bounds.Width / 2;
-            details.Width = Window.Current.Bounds.Width / 2;
-            notes.Width = Window.Current.Bounds.Width / 2;
-            SearchByModel.Width = Window.Current.Bounds.Width / 2;
-            SearchBySN.Width = Window.Current.Bounds.Width / 2;
-            stack3.Width = Window.Current.Bounds.Width / 4;
+
+            main.Width = Window.Current.Bounds.Width * .98;
+            mainStack.Width = Window.Current.Bounds.Width * .98;
+
+            stack0.Width = Window.Current.Bounds.Width * .95 / 2;
+            search.Width = Window.Current.Bounds.Width * .95 / 2;
+            details.Width = Window.Current.Bounds.Width * .95 / 2;
+            notes.Width = Window.Current.Bounds.Width * .95 / 2;
+
+
+            stack1.Width = Window.Current.Bounds.Width * .95 / 2;
+            SearchByModel.Width = Window.Current.Bounds.Width * .95 / 2;
+            SearchBySN.Width = Window.Current.Bounds.Width * .95 / 2;
+            stack3.Width = Window.Current.Bounds.Width * .95 / 4;
             ModelsAvailable.Visibility = Visibility.Collapsed;
-            mainStack.Height = Window.Current.Bounds.Height * 0.8;
+
+
 
             stack4.Width = Window.Current.Bounds.Width / 4;
             SearchOption.SelectedIndex = 0;
             SqlConnection modelConn = null;
             SqlDataReader reader = null;
-
+            
 
             try
             {
@@ -272,10 +279,36 @@ namespace SerialSearcher
                 SearchBySN.Visibility = Visibility.Visible;
             }
         }
-
-        private void ModelsAvailable_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            string selected = ((Models)ModelsAvailable.SelectedItem)?.ToString();
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                // Fetch the suggestions based on user input
+                var suggestions = GetSuggestions(sender.Text);
+
+                // Set the suggestions
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        private List<Models> GetSuggestions(string query)
+        {
+            // Filter the models based on the query
+            return ModelList.Where(model => model.modelDesc.StartsWith(query, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            // Accept the input as the selected value
+            string userInput = args.QueryText;
+        }
+
+
+        private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            // Get the selected item
+            var selected = args.SelectedItem.ToString();
+
             if (selected == null)
             {
                 System.Diagnostics.Debug.WriteLine("No model selected.");
@@ -345,9 +378,13 @@ namespace SerialSearcher
         private void DeviceGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int selectedIndex = DeviceGrid.SelectedIndex;
-            selectedDevice = deviceList[selectedIndex].GetSerial();
-            System.Diagnostics.Debug.WriteLine(selectedDevice);
-            FetchData(selectedDevice);
+            if (selectedIndex >= 0)
+            {
+                selectedDevice = deviceList[selectedIndex].GetSerial();
+                System.Diagnostics.Debug.WriteLine(selectedDevice);
+                FetchData(selectedDevice);
+            }
+            
         }
         string selectedDevice;
     }

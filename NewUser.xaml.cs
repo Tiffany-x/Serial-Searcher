@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Windows.Security.Cryptography.Core;
+using Windows.UI.Xaml;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -25,7 +26,11 @@ namespace SerialSearcher
         public NewUser()
         {
             this.InitializeComponent();
-            
+            mainStack.Width = Window.Current.Bounds.Width * .95;
+            mainStack.Height = Window.Current.Bounds.Height * .9;
+
+
+
         }
         private async Task<string> EncryptStringHelper(string plainString, string key)
         {

@@ -15,8 +15,10 @@
             <TextBlock Text=" Delivery Note" HorizontalAlignment="Left" FontSize="28" Margin="16,16,16,16"/>
             <StackPanel Name="stack0" Orientation="Horizontal">
                 <StackPanel Name="stack1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <Border Width="2"/>
-                    <Image Height="594" Margin="10" HorizontalAlignment="Center" Width="420" Name="ScannedImage"/>
+                    <Border BorderThickness="2" BorderBrush="Gray"  Height="598" Width="324" >
+                        <Image Height="594" Margin="10" HorizontalAlignment="Center" Width="420" Name="ScannedImage"/>
+
+                    </Border>
                 </StackPanel>
                 <StackPanel Name="stack2" HorizontalAlignment="Center" VerticalAlignment="Top" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto" >
                     <TextBlock Text="Waiting for scanner..." Name="NotificationTextBlock" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="16,16,16,16" VerticalAlignment="Center"/>

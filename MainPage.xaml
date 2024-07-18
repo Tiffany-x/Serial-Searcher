@@ -9,14 +9,15 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="730" Height="600">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="730" Height="600">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Vertical" Background="#114990" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Serial Searcher"  Foreground="White" HorizontalAlignment="Center" FontSize="32" Margin="16,16,16,16" FontFamily="against" FontWeight="Bold"/>
+            <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Employee Number: " TextWrapping="Wrap" Width="150" Margin="16,16,16,16"/>
+                    <TextBlock Text="Employee Number: " Foreground="White" VerticalAlignment="Center" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"/>
                     <TextBox Name="empID" BorderThickness="2" Width="150" Margin="16,16,16,16"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Password: " TextWrapping="Wrap" Width="150" Margin="16,16,16,16"/>
+                    <TextBlock Text="Password: " Foreground="White" VerticalAlignment="Center" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"/>
                     <PasswordBox Name="password" BorderThickness="2" Width="150" Margin="16,16,16,16"/>
             </StackPanel>
         </StackPanel>

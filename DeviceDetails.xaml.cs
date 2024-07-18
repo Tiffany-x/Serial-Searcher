@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -17,7 +18,10 @@ namespace SerialSearcher
     public sealed partial class DeviceDetails : Page
     {
         public static string deviceType;
+        List<Models> ModelList = new List<Models>();
+        List<string> DeviceList;
 
+        HashSet<string> modelDescriptions = new HashSet<string>();
         private int reps = 1;
         Dictionary<string,
                string> deviceMap = new Dictionary<string,
@@ -33,9 +37,62 @@ namespace SerialSearcher
             deliNo.Text = DeliveryScanPage.deliveryNumber;
             credNo.Text = CreditScanPage.creditNumber;
 
-            
+            if (reps == CreditScanPage.devices)
+            {
+                Save.Content = "Save All";
+            }
 
-                    
+            SqlConnection modelConn = null;
+            SqlDataReader reader = null;
+
+            DeviceList = new List<string> { "Laptop", "Monitor", "CPU", "Printer", "Mouse", "Toner" , "Battery (Laptop)", "Keyboard (Laptop)" , "UPS",
+            "Keyboard (Desktop)", "Switch", "Camera", "Telephone", "HDD", "SSD", "Hard Disk"};
+
+
+            try
+            {
+                modelConn = new SqlConnection(connectionString);
+
+                modelConn.Open();
+
+                SqlCommand modelQuery = new SqlCommand("SELECT model FROM device", modelConn);
+                reader = modelQuery.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        string modelDesc = reader["model"].ToString();
+
+                        // Check if the modelDesc is already in the HashSet
+                        if (!modelDescriptions.Contains(modelDesc))
+                        {
+                            // Add the modelDesc to the HashSet
+                            modelDescriptions.Add(modelDesc);
+
+                            // Add the new Models object to the ModelList
+                            ModelList.Add(new Models
+                            {
+                                modelDesc = modelDesc
+                            });
+                        }
+                    }
+
+                }
+
+            }
+            finally
+            {
+                // close reader
+                if (reader != null)
+                {
+                    reader.Close();
+                }
+
+                // close connection
+
+            }
+
+
 
             if (SerialNumber != null)
             {
@@ -50,6 +107,47 @@ namespace SerialSearcher
                 label.Text = reps+ " out of " +CreditScanPage.devices;
         }
 
+        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                // Fetch the suggestions based on user input
+                var suggestions = GetSuggestions(sender.Text);
+
+                // Set the suggestions
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        private List<Models> GetSuggestions(string query)
+        {
+            // Filter the models based on the query
+            return ModelList.Where(model => model.modelDesc.StartsWith(query, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        private List<string> GetDeviceSuggestions(string query)
+        {
+            // Filter the models based on the query
+            return DeviceList.Where(i => i.StartsWith(query, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        public string userInput;
+        private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            // Accept the input as the selected value
+            userInput = args.QueryText;
+        }
+
+
+        private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            // Get the selected item
+            userInput = args.SelectedItem.ToString();
+
+            
+        }
+
+
         Dictionary<string, string>[] devices = new Dictionary<string, string>[CreditScanPage.devices];
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
@@ -57,13 +155,13 @@ namespace SerialSearcher
             if (reps == CreditScanPage.devices)
             {
                 Save.Content = "Save All";
-                saveDetails(serialNo.Text, modelName.Text, specs.Text, systemInstall.Text);
+                saveDetails(serialNo.Text, userInput, specs.Text, systemInstall.Text);
 
                 devices[reps - 1] = new Dictionary<string, string>
                     {
                         {"devType", deviceType },
                         {"serialNo", serialNo.Text},
-                        {"model", modelName.Text},
+                        {"model", userInput},
                         {"specifications", specs.Text},
                         {"systemInstall", systInstall.Text},
                         {"invoiceNo", InvoiceScanPage.invoiceNumber},
@@ -197,10 +295,17 @@ namespace SerialSearcher
                             // Execute the query
                             try
                             {
-                                
                                 deviceQuery.ExecuteNonQuery();
                                 ShowToastNotification("Success", "Device has been recorded.");
                                 clearAll();
+                                InvoiceScanPage.invoicePath = "";
+                                InvoiceScanPage.invoiceNumber = "";
+                                InvoiceScanPage.invoiceDate = DateTimeOffset.Now;
+                                DeliveryScanPage.deliPath = "";
+                                DeliveryScanPage.deliveryNumber = "";
+                                DeliveryScanPage.deliveryDate = DateTimeOffset.Now;
+                                CreditScanPage.creditNumber = "";
+                                CreditScanPage.creditPath = "";
                             }
                             catch (Exception ex)
                             {
@@ -301,37 +406,10 @@ namespace SerialSearcher
             await dialog.ShowAsync();
         }
 
-        private void DeviceCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (DeviceCombo.SelectedIndex >= 0)
-            {
-                ComboBoxItem ComboItem = (ComboBoxItem)DeviceCombo.SelectedItem;
-                deviceType = ComboItem.Name;
-                System.Diagnostics.Debug.WriteLine("name: " + deviceType);
-                if (deviceType == "Desktop" || deviceType == "Laptop")
-                {
-                    systemInstall.Visibility = Visibility.Visible;
-                    systInstall.Visibility = Visibility.Visible;
-                    Specifications.Visibility = Visibility.Visible;
-                    specs.Visibility = Visibility.Visible;
-
-                }
-                else if (deviceType != "Desktop" || deviceType != "Laptop")
-                {
-                    systemInstall.Visibility = Visibility.Collapsed;
-                    systInstall.Visibility = Visibility.Collapsed;
-                    Specifications.Visibility = Visibility.Collapsed;
-                    specs.Visibility = Visibility.Collapsed;
-                }
-            }
-            
-        }
-
         
         private void clearAll()
         {
-
-            DeviceCombo.SelectedIndex = -1;
+            Devices.Text = "";
             serialNo.Text = "";
             modelName.Text = "";
             specs.Text = "";
@@ -341,6 +419,66 @@ namespace SerialSearcher
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(CreditScanPage));
+        }
+
+        private void Devices_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            chosenDevice = args.SelectedItem.ToString();
+            if (chosenDevice == "Desktop" || deviceType == "Laptop")
+            {
+                systemInstall.Visibility = Visibility.Visible;
+                systInstall.Visibility = Visibility.Visible;
+                Specifications.Visibility = Visibility.Visible;
+                specs.Visibility = Visibility.Visible;
+
+            }
+            else if (chosenDevice != "Desktop" || deviceType != "Laptop")
+            {
+                systemInstall.Visibility = Visibility.Collapsed;
+                systInstall.Visibility = Visibility.Collapsed;
+                Specifications.Visibility = Visibility.Collapsed;
+                specs.Visibility = Visibility.Collapsed;
+            }
+        }
+        public string chosenDevice;
+        private void DeviceSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            chosenDevice = args.QueryText;
+            if (chosenDevice == "Desktop" || deviceType == "Laptop")
+            {
+                systemInstall.Visibility = Visibility.Visible;
+                systInstall.Visibility = Visibility.Visible;
+                Specifications.Visibility = Visibility.Visible;
+                specs.Visibility = Visibility.Visible;
+
+            }
+            else if (chosenDevice != "Desktop" || deviceType != "Laptop")
+            {
+                systemInstall.Visibility = Visibility.Collapsed;
+                systInstall.Visibility = Visibility.Collapsed;
+                Specifications.Visibility = Visibility.Collapsed;
+                specs.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void DeviceSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                // Fetch the suggestions based on user input
+                var suggestions = GetDeviceSuggestions(sender.Text);
+
+                // Set the suggestions
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (reps == CreditScanPage.devices)
+            {
+                Save.Content = "Save All";
+            }
         }
     }
 

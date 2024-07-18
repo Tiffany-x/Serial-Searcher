@@ -180,27 +180,54 @@ namespace SerialSearcher
 
         private async void nextButton_Click(object sender, RoutedEventArgs e)
         {
-            creditNumber = credNo.Text;
-            string name = creditNumber + ".jpg";
-            try
+            if (scannedBitmap != null)
             {
-                string folderName = "Credit Notes";
-                StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
-                StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
-
-                // Perform the full scan to the specified folder
-                StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting);
-                creditPath = file.Path;
-                System.Diagnostics.Debug.WriteLine("Image path: " + creditPath);
-
-                using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                creditNumber = credNo.Text;
+                string name = creditNumber + ".jpg";
+                try
                 {
-                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
-                    encoder.SetSoftwareBitmap(scannedBitmap);
-                    await encoder.FlushAsync();
+                    string folderName = "Credit Notes";
+                    StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
+                    StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
+
+                    // Perform the full scan to the specified folder
+                    StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting);
+                    creditPath = file.Path;
+                    System.Diagnostics.Debug.WriteLine("Image path: " + creditPath);
+
+                    using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                    {
+                        BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
+                        encoder.SetSoftwareBitmap(scannedBitmap);
+                        await encoder.FlushAsync();
+                    }
+
+
+                    var dialog1 = new DeviceRequest();
+                    var result = await dialog1.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        System.Diagnostics.Debug.WriteLine("cancelled");
+                        dialog1.Hide();
+                    }
+                    else if (result == ContentDialogResult.Secondary)
+                    {
+                        devices = Int32.Parse(dialog1.Text);
+                        clearData();
+                        Frame.Navigate(typeof(DeviceDetails), devices);
+                        dialog1.Hide();
+                    }
+
+
+                    // Disable save and cancel buttons
                 }
-
-
+                catch (Exception ex)
+                {
+                    // Log or display the exception message
+                    System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
+                }
+            } else
+            {
                 var dialog1 = new DeviceRequest();
                 var result = await dialog1.ShowAsync();
                 if (result == ContentDialogResult.Primary)
@@ -215,21 +242,8 @@ namespace SerialSearcher
                     Frame.Navigate(typeof(DeviceDetails), devices);
                     dialog1.Hide();
                 }
-
-
-                // Disable save and cancel buttons
             }
-            catch (Exception ex)
-            {
-                // Log or display the exception message
-                System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
-            }
-
-
-            
-
-        }
-        
+        }        
         private async void error(string details)
         {
             ContentDialog dialog = new ContentDialog()
@@ -258,7 +272,7 @@ namespace SerialSearcher
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (invDate != null)
+            if (creditPath != null)
             {
                 StorageFile imageFile = await StorageFile.GetFileFromPathAsync(creditPath);
                 using (IRandomAccessStream fileStream = await imageFile.OpenAsync(FileAccessMode.Read))

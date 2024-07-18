@@ -29,7 +29,7 @@ namespace SerialSearcher
     /// </summary>
     public sealed partial class InvoiceScanPage : Page
     {
-        public static string invoicePath;
+        public static string invoicePath = "";
         private DeviceWatcher scannerWatcher;
         public static string invoiceNumber = "";
         
@@ -186,78 +186,93 @@ namespace SerialSearcher
             }
             else
             {
-                string name = invoiceNumber + ".jpg";
+                string name = invNo.Text + ".jpg";
                 if ((bool)invSameDeli_Check.IsChecked)
                 {
-                    
-
-                    try
-                    {
-                        string folderName = "Invoice Notes";
-                        StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
-                        StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
-
-                        // Perform the full scan to the specified folder
-                        StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting);
-
-                        invoicePath = file.Path;
-                        System.Diagnostics.Debug.WriteLine(invoicePath);
-
-                        using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                    if (scannedBitmap != null) {
+                        try
                         {
-                            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
-                            encoder.SetSoftwareBitmap(scannedBitmap);
-                            await encoder.FlushAsync();
+                            string folderName = "Invoice Notes";
+                            StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
+                            StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
+
+                            // Perform the full scan to the specified folder
+                            StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting);
+
+                            invoicePath = file.Path;
+                            System.Diagnostics.Debug.WriteLine(invoicePath);
+
+                            using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                            {
+                                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
+                                encoder.SetSoftwareBitmap(scannedBitmap);
+                                await encoder.FlushAsync();
+                            }
+                            saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
+                            DeliveryScanPage.deliveryNumber = invoiceNumber;
+                            System.Diagnostics.Debug.WriteLine("invoice: " + invoiceNumber);
+                            System.Diagnostics.Debug.WriteLine("delivery: " + DeliveryScanPage.deliveryNumber);
+                            clearData();
+                            Frame.Navigate(typeof(CreditScanPage));
                         }
-                    saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
+                        catch (Exception ex)
+                        {
+                            // Log or display the exception message
+                            error($"Save failed: {ex.Message}");
+                        }
+                    } else
+                    {
+                        saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
                         DeliveryScanPage.deliveryNumber = invoiceNumber;
                         System.Diagnostics.Debug.WriteLine("invoice: " + invoiceNumber);
                         System.Diagnostics.Debug.WriteLine("delivery: " + DeliveryScanPage.deliveryNumber);
                         clearData();
                         Frame.Navigate(typeof(CreditScanPage));
+
                     }
-                    catch (Exception ex)
-                    {
-                        // Log or display the exception message
-                        error($"Save failed: {ex.Message}");
-                    }
-                    
-                    
+
+
+
                 } else
                 {
                     //different invoice and delivery notes
-                    try
+                    if (scannedBitmap != null)
                     {
-                        string folderName = "Invoice Notes";
-                        StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
-                        StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
-
-                        // Perform the full scan to the specified folder
-                        StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.GenerateUniqueName);
-                        invoicePath = file.Path;
-                        System.Diagnostics.Debug.WriteLine("Image path: " + invoicePath);
-
-                        using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                        try
                         {
-                            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
-                            encoder.SetSoftwareBitmap(scannedBitmap);
-                            await encoder.FlushAsync();
+                            string folderName = "Invoice Notes";
+                            StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
+                            StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
+
+                            // Perform the full scan to the specified folder
+                            StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.GenerateUniqueName);
+                            invoicePath = file.Path;
+                            System.Diagnostics.Debug.WriteLine("Image path: " + invoicePath);
+
+                            using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                            {
+                                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
+                                encoder.SetSoftwareBitmap(scannedBitmap);
+                                await encoder.FlushAsync();
+                            }
+                            saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
+                            clearData();
+                            Frame.Navigate(typeof(DeliveryScanPage));
+
                         }
+                        catch (Exception ex)
+                        {
+                            // Log or display the exception message
+                            error($"Save failed: {ex.Message}");
+                        }
+                    } else
+                    {
                         saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
                         clearData();
                         Frame.Navigate(typeof(DeliveryScanPage));
-
                     }
-                    catch (Exception ex)
-                    {
-                        // Log or display the exception message
-                        error($"Save failed: {ex.Message}");
-                    }
-                    
-                }
-                
+                }                
             }
-
         }
 
         private async void error(string details)
@@ -286,7 +301,7 @@ namespace SerialSearcher
         }
 
         public static DateTimeOffset invoiceDate;
-        public static string company;
+        public static string company = "";
         public static bool sameDeli;
 
         private void clearData()
@@ -305,17 +320,17 @@ namespace SerialSearcher
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            mainStack.Width = Window.Current.Bounds.Width * 0.9;
-            stack0.Width = Window.Current.Bounds.Width * 0.9;
-            stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
-            stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
+            mainStack.Width = Window.Current.Bounds.Width;
+            stack0.Width = Window.Current.Bounds.Width;
+            stack1.Width = Window.Current.Bounds.Width / 2;
+            stack2.Width = Window.Current.Bounds.Width / 2;
             invDate.MaxDate = DateTime.Now;
             if (sameDeli)
             {
                 invSameDeli_Check.IsChecked = true;
             }
 
-            if (company != null)
+            if (invoicePath != "")
             {
                 invNo.Text = invoiceNumber;
                 comp.Text = company;
