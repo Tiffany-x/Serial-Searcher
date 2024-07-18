@@ -127,9 +127,18 @@ namespace SerialSearcher
             }*/
         }
 
-        /*private void mainNavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+        private void Log_Out_cmd(object sender, RoutedEventArgs e)
         {
-
-        }*/
+            MainPage.access = "";
+            Frame.Navigate(typeof(MainPage));
+            InvoiceScanPage.invoicePath = "";
+            InvoiceScanPage.invoiceNumber = "";
+            InvoiceScanPage.invoiceDate = DateTimeOffset.Now;
+            DeliveryScanPage.deliPath = "";
+            DeliveryScanPage.deliveryNumber = "";
+            DeliveryScanPage.deliveryDate = DateTimeOffset.Now;
+            CreditScanPage.creditNumber = "";
+            CreditScanPage.creditPath = "";
+        }
     }
 }

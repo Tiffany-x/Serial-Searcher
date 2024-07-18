@@ -13,7 +13,8 @@
                      Loaded="mainNavView_Loaded" 
                      ItemInvoked="mainNavView_ItemInvoked"
                         IsBackButtonVisible="Collapsed"
-            PaneDisplayMode="Top" PaneTitle="Serial Searcher">
+            PaneDisplayMode="Top" PaneTitle="Serial Searcher"
+                        IsSettingsVisible="False">
 
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Name="navItem_addDevicePage" Content="Add a Device"/>
@@ -21,10 +22,13 @@
                 <NavigationViewItem x:Name="navItem_createUserPage" Content="Create a User"/>
             </NavigationView.MenuItems>
 
+
             <Frame x:Name="ContentFrame"/>
 
 
-            
+            <NavigationView.PaneFooter>
+                <Button Content="Log Out" Click="Log_Out_cmd" Margin="0 0 10 0" Padding="0"/>
+            </NavigationView.PaneFooter>
             
         </NavigationView>
         

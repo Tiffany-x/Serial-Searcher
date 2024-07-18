@@ -181,34 +181,45 @@ namespace SerialSearcher
             }
             else
             {
-                string name = deliveryNumber + ".jpg";
-                try
+                if (scannedBitmap != null)
                 {
-                    string folderName = "Delivery Notes";
-                    StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
-                    StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
-
-                    // Perform the full scan to the specified folder
-                    StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting);
-                    deliPath = file.Path;
-                    System.Diagnostics.Debug.WriteLine("Image path: " + deliPath);
-
-                    using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                    string name = deliNo.Text + ".jpg";
+                    try
                     {
-                        BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
-                        encoder.SetSoftwareBitmap(scannedBitmap);
-                        await encoder.FlushAsync();
+                        string folderName = "Delivery Notes";
+                        StorageFolder documentsFolder = KnownFolders.DocumentsLibrary;
+                        StorageFolder folder = await documentsFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
+
+                        // Perform the full scan to the specified folder
+                        StorageFile file = await folder.CreateFileAsync(name, CreationCollisionOption.ReplaceExisting);
+                        deliPath = file.Path;
+                        System.Diagnostics.Debug.WriteLine("Image path: " + deliPath);
+
+                        using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                        {
+                            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, fileStream);
+                            encoder.SetSoftwareBitmap(scannedBitmap);
+                            await encoder.FlushAsync();
+                        }
                     }
-                }
-                catch (Exception ex)
+                    catch (Exception ex)
+                    {
+                        // Log or display the exception message
+                        System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
+                    }
+                    saveDetails((DateTimeOffset)deliDate.Date);
+                    System.Diagnostics.Debug.WriteLine(deliDate.Date);
+                    clearData();
+                    Frame.Navigate(typeof(CreditScanPage));
+                } else
                 {
-                    // Log or display the exception message
-                    System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
+                    saveDetails((DateTimeOffset)deliDate.Date);
+                    System.Diagnostics.Debug.WriteLine(deliDate.Date);
+                    clearData();
+                    Frame.Navigate(typeof(CreditScanPage));
+
                 }
-                saveDetails((DateTimeOffset)deliDate.Date);
-                System.Diagnostics.Debug.WriteLine(deliDate.Date);
-                clearData();
-                Frame.Navigate(typeof(CreditScanPage));
+
             }
         }
 

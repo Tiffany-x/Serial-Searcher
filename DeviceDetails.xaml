@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="Page_Loaded">
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0, 0, 0, 50">
@@ -16,23 +17,12 @@
                     <StackPanel Name="itemStack" Orientation="Horizontal">
                         <TextBlock Text="Type of device:" Width="150" TextWrapping="Wrap" Margin="16,16,16,16"/>
                         <StackPanel>
-                            <ComboBox Margin="16,16,16,16"  Width="200" Name="DeviceCombo" IsEditable="True" SelectionChanged="DeviceCombo_SelectionChanged" SelectedItem="DeviceSelected">
-                                <ComboBoxItem Name ="Laptop">Laptop</ComboBoxItem>
-                                <ComboBoxItem Name ="Desktop">Desktop</ComboBoxItem>
-                                <ComboBoxItem Name ="Printer">Printer</ComboBoxItem>
-                                <ComboBoxItem Name ="Mouse">Mouse</ComboBoxItem>
-                                <ComboBoxItem Name ="Toner">Toner</ComboBoxItem>
-                                <ComboBoxItem Name ="LaptopBattery">Battery (Laptop)</ComboBoxItem>
-                                <ComboBoxItem Name ="LaptopKeyboard">Keyboard (Laptop)</ComboBoxItem>
-                                <ComboBoxItem Name ="UPS">UPS</ComboBoxItem>
-                                <ComboBoxItem Name ="DesktopKeyboard">Keyboard (Desktop)</ComboBoxItem>
-                                <ComboBoxItem Name ="Switch">Switch</ComboBoxItem>
-                                <ComboBoxItem Name ="Camera">Camera</ComboBoxItem>
-                                <ComboBoxItem Name ="Telephone">Telephone</ComboBoxItem>
-                                <ComboBoxItem Name ="HDD">Hard Disk (HDD)</ComboBoxItem>
-                                <ComboBoxItem Name ="HandPunch">Hand Punch</ComboBoxItem>
-                                <ComboBoxItem Name ="SSD">SSD</ComboBoxItem>
-                            </ComboBox>
+                            <AutoSuggestBox Name="Devices" 
+                                        TextChanged="DeviceSuggestBox_TextChanged"
+                                        QuerySubmitted="DeviceSuggestBox_QuerySubmitted"
+                                        SuggestionChosen="Devices_SuggestionChosen" 
+                                        QueryIcon="Find"
+                                        Margin="16,16,16,16" Width="200"/>
 
                         </StackPanel>
                     </StackPanel>
@@ -42,7 +32,12 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Model:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBox Name="modelName" TextWrapping="Wrap" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                        <AutoSuggestBox Name="modelName" 
+                                        TextChanged="AutoSuggestBox_TextChanged"
+                                        QuerySubmitted="AutoSuggestBox_QuerySubmitted"
+                                        SuggestionChosen="AutoSuggestBox_SuggestionChosen" 
+                                        QueryIcon="Find"
+                                        Margin="16,16,16,16" Width="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Name="Specifications" Text="Specifications:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
