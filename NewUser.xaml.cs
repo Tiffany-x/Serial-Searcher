@@ -26,10 +26,6 @@ namespace SerialSearcher
         public NewUser()
         {
             this.InitializeComponent();
-            mainStack.Width = Window.Current.Bounds.Width * .95;
-            mainStack.Height = Window.Current.Bounds.Height * .9;
-
-
 
         }
         private async Task<string> EncryptStringHelper(string plainString, string key)
