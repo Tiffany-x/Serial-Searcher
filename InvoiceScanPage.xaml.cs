@@ -16,6 +16,9 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Drawing;
 using Windows.Media.Ocr;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data.SqlClient;
 
 
 
@@ -29,16 +32,65 @@ namespace SerialSearcher
     /// </summary>
     public sealed partial class InvoiceScanPage : Page
     {
+        List<Company> CompanyList = new List<Company>();
         public static string invoicePath = "";
         private DeviceWatcher scannerWatcher;
         public static string invoiceNumber = "";
-        
+        private string connectionString = @"Data Source = SPARE3-DIT\SQLEXPRESS; Initial Catalog = serial_searcher; Integrated Security = true;";
 
 
         public InvoiceScanPage()
         {
             this.InitializeComponent();
-            
+
+            SqlConnection companyConn = null;
+            SqlDataReader reader = null;
+            HashSet<string> companyDescriptions = new HashSet<string>();
+
+
+            try
+            {
+                companyConn = new SqlConnection(connectionString);
+
+                companyConn.Open();
+
+                SqlCommand modelQuery = new SqlCommand("SELECT company FROM device", companyConn);
+                reader = modelQuery.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        string companyDesc = reader["company"].ToString();
+
+                        // Check if the companyDesc is already in the HashSet
+                        if (!companyDescriptions.Contains(companyDesc))
+                        {
+                            // Add the companyDesc to the HashSet
+                            companyDescriptions.Add(companyDesc);
+
+                            // Add the new Models object to the ModelList
+                            CompanyList.Add(new Company
+                            {
+                                companyDesc = companyDesc
+                            });
+                        }
+                    }
+
+                }
+
+            }
+            finally
+            {
+                // close reader
+                if (reader != null)
+                {
+                    reader.Close();
+                }
+
+                // close connection
+
+            }
+
         }
 
         private void InitDeviceWatcher()
@@ -165,6 +217,40 @@ namespace SerialSearcher
 
 
 
+        private void compSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                // Fetch the suggestions based on user input
+                var suggestions = GetSuggestions(sender.Text);
+
+                // Set the suggestions
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        private List<Company> GetSuggestions(string query)
+        {
+            // Filter the models based on the query
+            return CompanyList.Where(company => company.companyDesc.StartsWith(query, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        public string userInput;
+        private void compSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            // Accept the input as the selected value
+            userInput = args.QueryText;
+        }
+
+
+        private void comp_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            // Get the selected item
+            userInput = args.SelectedItem.ToString();
+
+
+        }
+
         private void cancelScanButton_Click(object sender, RoutedEventArgs e)
         {
             // Clear the displayed image and disable save and cancel buttons
@@ -173,10 +259,6 @@ namespace SerialSearcher
             Next.IsEnabled = false;
         }
 
-        public TextBox getTextBox()
-        {
-            return invNo;
-        }
 
         private async void nextButton_Click(object sender, RoutedEventArgs e)
         {

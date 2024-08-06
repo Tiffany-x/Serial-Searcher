@@ -23,6 +23,7 @@ namespace SerialSearcher
     /// </summary>
     public sealed partial class SearchDevice : Page
     {
+        List<Company> CompanyList = new List<Company>();
         public string connectionString = @"Data Source = SPARE3-DIT\SQLEXPRESS; Initial Catalog = serial_searcher; Integrated Security = true;";
         List<Models> ModelList = new List<Models>();
         HashSet<string> modelDescriptions = new HashSet<string>();
@@ -34,28 +35,72 @@ namespace SerialSearcher
             this.InitializeComponent();
 
             DeviceGrid.IsReadOnly = true;
+            DeviceGrid.MaxHeight = Window.Current.Bounds.Height * .8;
 
             main.Width = Window.Current.Bounds.Width * .98;
             mainStack.Width = Window.Current.Bounds.Width * .98;
 
             stack0.Width = Window.Current.Bounds.Width * .95 / 2;
-            search.Width = Window.Current.Bounds.Width * .95 / 2;
-            details.Width = Window.Current.Bounds.Width * .95 / 2;
-            notes.Width = Window.Current.Bounds.Width * .95 / 2;
 
 
             stack1.Width = Window.Current.Bounds.Width * .95 / 2;
-            SearchByModel.Width = Window.Current.Bounds.Width * .95 / 2;
             SearchBySN.Width = Window.Current.Bounds.Width * .95 / 2;
             stack3.Width = Window.Current.Bounds.Width * .95 / 4;
             ModelsAvailable.Visibility = Visibility.Collapsed;
 
 
+            SqlConnection companyConn = null;
+            SqlDataReader reader = null;
+            HashSet<string> companyDescriptions = new HashSet<string>();
+
+
+            try
+            {
+                companyConn = new SqlConnection(connectionString);
+
+                companyConn.Open();
+
+                SqlCommand modelQuery = new SqlCommand("SELECT company FROM device", companyConn);
+                reader = modelQuery.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        string companyDesc = reader["company"].ToString();
+
+                        // Check if the companyDesc is already in the HashSet
+                        if (!companyDescriptions.Contains(companyDesc))
+                        {
+                            // Add the companyDesc to the HashSet
+                            companyDescriptions.Add(companyDesc);
+
+                            // Add the new Models object to the ModelList
+                            CompanyList.Add(new Company
+                            {
+                                companyDesc = companyDesc
+                            });
+                        }
+                    }
+
+                }
+
+            }
+            finally
+            {
+                // close reader
+                if (reader != null)
+                {
+                    reader.Close();
+                }
+
+                // close connection
+
+            }
 
             stack4.Width = Window.Current.Bounds.Width / 4;
             SearchOption.SelectedIndex = 0;
             SqlConnection modelConn = null;
-            SqlDataReader reader = null;
+            reader = null;
             
 
             try
@@ -112,6 +157,112 @@ namespace SerialSearcher
         {
             FetchData(serialNumber.Text);
                 
+        }
+
+        private void compSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                // Fetch the suggestions based on user input
+                var suggestions = GetSuggestions(sender.Text);
+
+                // Set the suggestions
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        private List<Company> GetSuggestions(string query)
+        {
+            // Filter the models based on the query
+            return CompanyList.Where(company => company.companyDesc.StartsWith(query, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        String selected;
+        private void compSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            // Accept the input as the selected value
+            selected = args.QueryText;
+            populateGrid(selected);
+        }
+        private void comp_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            // Get the selected item
+            selected = args.SelectedItem.ToString();
+            populateGrid(selected);
+            
+
+        }
+
+        private void populateGrid(string chosen)
+        {
+            if (selected == null)
+            {
+                System.Diagnostics.Debug.WriteLine("No company selected.");
+                return;
+            }
+
+            System.Diagnostics.Debug.WriteLine("Selected company: " + selected);
+
+            SqlConnection deviceConn = null;
+            SqlDataReader reader = null;
+
+            try
+            {
+                using (deviceConn = new SqlConnection(connectionString))
+                {
+                    deviceConn.Open();
+                    System.Diagnostics.Debug.WriteLine("Database connection opened.");
+
+                    var command = deviceConn.CreateCommand();
+                    command.CommandText = "SELECT deviceType, model, specsNsystem, serialNo, invoiceNo, deliveryNo, creditNo FROM device WHERE company = @company";
+                    command.Parameters.AddWithValue("@company", selected);
+
+                    DataTable dataTable = new DataTable();
+                    using (var dataAdapter = new SqlDataAdapter(command))
+                    {
+                        dataAdapter.Fill(dataTable);
+                    }
+
+                    if (dataTable.Rows.Count == 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("No data found for the selected company.");
+                        return;
+                    }
+
+                    System.Diagnostics.Debug.WriteLine("Data retrieved successfully.");
+
+                    // Clear the DataGrid
+                    DeviceGrid.ItemsSource = null;
+
+                    // Create a collection of Device objects to use as the ItemsSource
+                    deviceList = new ObservableCollection<Devices>();
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        var device = new Devices
+                        {
+                            deviceType = row["deviceType"].ToString(),
+                            model = row["model"].ToString(),
+                            specsNsystem = row["specsNsystem"].ToString(),
+                            SerialNo = row["serialNo"].ToString(),
+                            InvoiceNo = row["invoiceNo"].ToString(),
+                            deliveryNo = row["deliveryNo"].ToString(),
+                            creditNo = row["creditNo"].ToString()
+                        };
+                        deviceList.Add(device);
+                    }
+
+                    DeviceGrid.ItemsSource = deviceList;
+                    System.Diagnostics.Debug.WriteLine("Data bound to DataGrid successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions as needed
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+                reader?.Close();
+            }
         }
 
         private void FetchData(string device)
@@ -264,34 +415,58 @@ namespace SerialSearcher
 
         private void SearchOption_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (SearchOption.SelectedIndex == 0)
+            switch (SearchOption.SelectedIndex)
             {
-                serialNumber.Visibility = Visibility.Visible;
-                ModelsAvailable.Visibility = Visibility.Collapsed;
-                SearchBySN.Visibility = Visibility.Visible;
-                SearchByModel.Visibility = Visibility.Collapsed;
-            } else
-            {
-                search_button.Visibility = Visibility.Collapsed;
-                ModelsAvailable.Visibility = Visibility.Visible;
-                serialNumber.Visibility = Visibility.Collapsed;
-                SearchByModel.Visibility = Visibility.Visible;
-                SearchBySN.Visibility = Visibility.Visible;
+                case 0:
+                    serialNumber.Visibility = Visibility.Visible;
+                    ModelsAvailable.Visibility = Visibility.Collapsed;
+                    comp.Visibility = Visibility.Collapsed;
+                    SearchBySN.Visibility = Visibility.Visible;
+                    SearchByModel.Visibility = Visibility.Collapsed;
+                    search_button.Visibility = Visibility.Visible;
+                    break;
+                case 1:
+                    DeviceGrid.ItemsSource = null;
+                    search_button.Visibility = Visibility.Collapsed;
+                    ModelsAvailable.Visibility = Visibility.Visible;
+                    comp.Visibility = Visibility.Collapsed;
+                    serialNumber.Visibility = Visibility.Collapsed;
+                    SearchByModel.Visibility = Visibility.Visible;
+                    SearchBySN.Visibility = Visibility.Collapsed;
+                    stack1.Visibility = Visibility.Collapsed;
+                    stack0.Width = Window.Current.Bounds.Width * .95;
+                    notes.Visibility = Visibility.Collapsed;
+                    break;
+                default:
+                    DeviceGrid.ItemsSource = null;
+                    search_button.Visibility = Visibility.Collapsed;
+                    ModelsAvailable.Visibility = Visibility.Collapsed;
+                    comp.Visibility = Visibility.Visible;
+                    serialNumber.Visibility = Visibility.Collapsed;
+                    SearchByModel.Visibility = Visibility.Visible;
+                    SearchBySN.Visibility = Visibility.Collapsed;
+                    stack1.Visibility = Visibility.Collapsed;
+                    stack0.Width = Window.Current.Bounds.Width * .95;
+                    notes.Visibility = Visibility.Collapsed;
+
+                    break;
             }
+
+            
         }
         private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 // Fetch the suggestions based on user input
-                var suggestions = GetSuggestions(sender.Text);
+                var suggestions = GetModelSuggestions(sender.Text);
 
                 // Set the suggestions
                 sender.ItemsSource = suggestions;
             }
         }
 
-        private List<Models> GetSuggestions(string query)
+        private List<Models> GetModelSuggestions(string query)
         {
             // Filter the models based on the query
             return ModelList.Where(model => model.modelDesc.StartsWith(query, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -328,7 +503,7 @@ namespace SerialSearcher
                     System.Diagnostics.Debug.WriteLine("Database connection opened.");
 
                     var command = deviceConn.CreateCommand();
-                    command.CommandText = "SELECT serialNo, invoiceNo FROM device WHERE model = @model";
+                    command.CommandText = "SELECT deviceType, model, specsNsystem, serialNo, invoiceNo, deliveryNo, creditNo FROM device WHERE model = @model";
                     command.Parameters.AddWithValue("@model", selected);
 
                     DataTable dataTable = new DataTable();
@@ -354,8 +529,14 @@ namespace SerialSearcher
                     {
                         var device = new Devices
                         {
+                            deviceType = row["deviceType"].ToString(),
+                            model = row["model"].ToString(),
+                            specsNsystem = row["specsNsystem"].ToString(),
                             SerialNo = row["serialNo"].ToString(),
-                            InvoiceNo = row["invoiceNo"].ToString()
+                            InvoiceNo = row["invoiceNo"].ToString(),
+                            deliveryNo = row["deliveryNo"].ToString(),
+                            creditNo = row["creditNo"].ToString()
+
                         };
                         deviceList.Add(device);
                     }
@@ -391,9 +572,13 @@ namespace SerialSearcher
 
     public class Devices
     {
+        public string deviceType { get; set; }
+        public string model { get; set; }
+        public string specsNsystem { get; set; }
         public string SerialNo { get; set; }
         public string InvoiceNo { get; set; }
-
+        public string deliveryNo { get; set; }
+        public string creditNo { get; set; }
         public string GetSerial()
         {
             return SerialNo;

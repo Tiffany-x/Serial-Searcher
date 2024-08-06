@@ -15,12 +15,13 @@
 
             <StackPanel Name="mainStack" Orientation="Horizontal" >
 
-                <StackPanel Name="stack0" HorizontalAlignment="Center">
-                    <StackPanel Orientation="Horizontal" Name="search" HorizontalAlignment="Center" Padding="0 16 0 0">
+                <StackPanel Name="stack0">
+                    <StackPanel Orientation="Horizontal" Name="search" Padding="0 16 0 0">
                         <TextBlock Text="Search by:" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,16,5,16"/>
-                        <ComboBox Margin="5,16,5,16"  Width="100" Name="SearchOption" SelectionChanged="SearchOption_SelectionChanged" SelectedItem="SearchSelected">
+                        <ComboBox Margin="5,16,5,16"  Width="110" Name="SearchOption" SelectionChanged="SearchOption_SelectionChanged" SelectedItem="SearchSelected">
                             <ComboBoxItem Content="Serial No."/>
                             <ComboBoxItem Content="Model"/>
+                            <ComboBoxItem Content="Company"/>
                         </ComboBox>
                         <TextBox Name="serialNumber" TextWrapping="Wrap" VerticalAlignment="Center" BorderThickness="2" Width="150" Margin="5,16,5,16"></TextBox>
                         <AutoSuggestBox Name="ModelsAvailable" Visibility="Collapsed" 
@@ -29,18 +30,26 @@
                                         SuggestionChosen="AutoSuggestBox_SuggestionChosen" 
                                         QueryIcon="Find"
                                         Margin="16,16,16,16" Width="200"/>
+                        <AutoSuggestBox Name="comp" 
+                                        TextChanged="compSuggestBox_TextChanged"
+                                        QuerySubmitted="compSuggestBox_QuerySubmitted"
+                                        SuggestionChosen="comp_SuggestionChosen"
+                                        Visibility="Collapsed"
+                                        FlowDirection="LeftToRight"
+                                        AllowDrop="True"
+                                        QueryIcon="Find"
+                                        Margin="16,16,16,16" Width="200"/>
                         <Button Name="search_button" Content="Search" Width="100" Click="search_button_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,16,5,16" />
                     </StackPanel>
-                    <StackPanel Name="details" >
+                    <StackPanel Name="details" HorizontalAlignment="Left">
                     <StackPanel Name="SearchByModel">
                         <controls:DataGrid 
                             HorizontalScrollBarVisibility="Hidden"
                             SelectionChanged="DeviceGrid_SelectionChanged"
                             Name="DeviceGrid"
-                                           Width="300"
-                                           ColumnWidth="150"
+                                           Width="auto"
+                                           ColumnWidth="120"
                                            Height="auto"
-                                           MaxHeight="200"
                                            HeadersVisibility="Column"
                             IsDoubleTapEnabled="False"
                     CanUserSortColumns="True"
@@ -53,9 +62,15 @@
                             Margin="20, 20, 20, 20"
                                            ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Foreground="Black" Header="Serial No" Binding="{Binding SerialNo}" />
-                                <controls:DataGridTextColumn Foreground="Black" Header="Invoice No" Binding="{Binding InvoiceNo}" />
-                            </controls:DataGrid.Columns>
+                                    <controls:DataGridTextColumn Foreground="Black" Header="Device Type" Binding="{Binding deviceType}" />
+                                    <controls:DataGridTextColumn Foreground="Black" Header="Model" Binding="{Binding model}" />
+                                    <controls:DataGridTextColumn Foreground="Black" Header="Specifications" Binding="{Binding specsNsystem}" />
+                                    <controls:DataGridTextColumn Foreground="Black" Header="Serial No" Binding="{Binding SerialNo}" />
+                                    <controls:DataGridTextColumn Foreground="Black" Header="Invoice No" Binding="{Binding InvoiceNo}" />
+                                    <controls:DataGridTextColumn Foreground="Black" Header="Delivery No" Binding="{Binding deliveryNo}" />
+                                    <controls:DataGridTextColumn Foreground="Black" Header="Credit No" Binding="{Binding deliveryNo}" />
+
+                                </controls:DataGrid.Columns>
                         </controls:DataGrid>
                     </StackPanel>
                     <StackPanel Name="SearchBySN" Visibility="Visible" Orientation="Horizontal" HorizontalAlignment="Left" IsDoubleTapEnabled="False" KeyTipPlacementMode="Auto">

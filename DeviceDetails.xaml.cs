@@ -107,7 +107,7 @@ namespace SerialSearcher
                 label.Text = reps+ " out of " +CreditScanPage.devices;
         }
 
-        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void modelSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
@@ -132,14 +132,14 @@ namespace SerialSearcher
         }
 
         public string userInput;
-        private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private void modelSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             // Accept the input as the selected value
             userInput = args.QueryText;
         }
 
 
-        private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        private void modelSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             // Get the selected item
             userInput = args.SelectedItem.ToString();
@@ -154,7 +154,6 @@ namespace SerialSearcher
         {
             if (reps == CreditScanPage.devices)
             {
-                Save.Content = "Save All";
                 saveDetails(serialNo.Text, userInput, specs.Text, systemInstall.Text);
 
                 devices[reps - 1] = new Dictionary<string, string>
@@ -166,7 +165,8 @@ namespace SerialSearcher
                         {"systemInstall", systInstall.Text},
                         {"invoiceNo", InvoiceScanPage.invoiceNumber},
                         {"deliveryNo", DeliveryScanPage.deliveryNumber},
-                        {"creditNo", CreditScanPage.creditNumber}
+                        {"creditNo", CreditScanPage.creditNumber},
+                        {"company", InvoiceScanPage.company}
                     };
 
 
@@ -265,8 +265,8 @@ namespace SerialSearcher
                         }
                         // Create a new SqlCommand for each device to avoid parameter conflicts
                         using (deviceQuery = new SqlCommand(
-                            "INSERT INTO device(deviceType, model, serialNo, specsNsystem, invoiceNo, deliveryNo, creditNo, createdAt) " +
-        "VALUES(@type, @model, @serialNo, @specsNsystem, @invNo, @deliNo, @credNo, @createdAt)", saveAllConn))
+                            "INSERT INTO device(deviceType, model, serialNo, specsNsystem, invoiceNo, deliveryNo, creditNo, createdAt, company) " +
+        "VALUES(@type, @model, @serialNo, @specsNsystem, @invNo, @deliNo, @credNo, @createdAt, @company)", saveAllConn))
                         {
                             deviceQuery.CommandType = System.Data.CommandType.Text;
                             // Assign parameters based on the current device details
@@ -291,6 +291,7 @@ namespace SerialSearcher
                             deviceQuery.Parameters.AddWithValue("@deliNo", currentDevice["deliveryNo"]);
                             deviceQuery.Parameters.AddWithValue("@credNo", currentDevice["creditNo"]);
                             deviceQuery.Parameters.AddWithValue("@createdAt", DateTime.Now);
+                            deviceQuery.Parameters.AddWithValue("@company", currentDevice["company"]);
 
                             // Execute the query
                             try
@@ -409,7 +410,6 @@ namespace SerialSearcher
         
         private void clearAll()
         {
-            Devices.Text = "";
             serialNo.Text = "";
             modelName.Text = "";
             specs.Text = "";

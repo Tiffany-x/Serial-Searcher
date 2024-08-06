@@ -20,7 +20,8 @@
                             <AutoSuggestBox Name="Devices" 
                                         TextChanged="DeviceSuggestBox_TextChanged"
                                         QuerySubmitted="DeviceSuggestBox_QuerySubmitted"
-                                        SuggestionChosen="Devices_SuggestionChosen" 
+                                        SuggestionChosen="Devices_SuggestionChosen"
+                                        
                                         QueryIcon="Find"
                                         Margin="16,16,16,16" Width="200"/>
 
@@ -33,9 +34,9 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Model:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
                         <AutoSuggestBox Name="modelName" 
-                                        TextChanged="AutoSuggestBox_TextChanged"
-                                        QuerySubmitted="AutoSuggestBox_QuerySubmitted"
-                                        SuggestionChosen="AutoSuggestBox_SuggestionChosen" 
+                                        TextChanged="modelSuggestBox_TextChanged"
+                                        QuerySubmitted="modelSuggestBox_QuerySubmitted"
+                                        SuggestionChosen="modelSuggestBox_SuggestionChosen" 
                                         QueryIcon="Find"
                                         Margin="16,16,16,16" Width="200"/>
                     </StackPanel>

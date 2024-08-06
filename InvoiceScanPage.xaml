@@ -35,7 +35,14 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Company:" TextWrapping="Wrap" Width="150" Margin="16,16,16,16"></TextBlock>
-                        <TextBox Name="comp" BorderThickness="2" Width="200" Margin="16,16,16,16"></TextBox>
+                        <AutoSuggestBox Name="comp" 
+                                        TextChanged="compSuggestBox_TextChanged"
+                                        QuerySubmitted="compSuggestBox_QuerySubmitted"
+                                        SuggestionChosen="comp_SuggestionChosen"
+                                        FlowDirection="LeftToRight"
+                                        AllowDrop="True"
+                                        QueryIcon="Find"
+                                        Margin="16,16,16,16" Width="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Button Name="cancelScanButton" Content="Cancel Scan" Click="cancelScanButton_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50,10,50,10"/>

@@ -38,6 +38,7 @@ namespace SerialSearcher
             stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
             stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
             deliDate.MaxDate = DateTime.Now;
+            deliDate.Date = InvoiceScanPage.invoiceDate;
 
 
             deliNo.Text = deliveryNumber;
@@ -207,13 +208,13 @@ namespace SerialSearcher
                         // Log or display the exception message
                         System.Diagnostics.Debug.WriteLine($"Save failed: {ex.Message}");
                     }
-                    saveDetails((DateTimeOffset)deliDate.Date);
+                    saveDetails((DateTimeOffset)deliDate.Date, deliNo.Text);
                     System.Diagnostics.Debug.WriteLine(deliDate.Date);
                     clearData();
                     Frame.Navigate(typeof(CreditScanPage));
                 } else
                 {
-                    saveDetails((DateTimeOffset)deliDate.Date);
+                    saveDetails((DateTimeOffset)deliDate.Date, deliNo.Text);
                     System.Diagnostics.Debug.WriteLine(deliDate.Date);
                     clearData();
                     Frame.Navigate(typeof(CreditScanPage));
@@ -231,7 +232,7 @@ namespace SerialSearcher
         private async void Page_Loaded_1(object sender, RoutedEventArgs e)
         {
             
-            if (deliveryDate != null)
+            if (deliPath != null)
             {
                 StorageFile imageFile = await StorageFile.GetFileFromPathAsync(deliPath);
                 using (IRandomAccessStream fileStream = await imageFile.OpenAsync(FileAccessMode.Read))
@@ -251,9 +252,10 @@ namespace SerialSearcher
 
         public static DateTimeOffset deliveryDate;
 
-        public static void saveDetails(DateTimeOffset deliDate)
+        public static void saveDetails(DateTimeOffset deliDate, string deliNo)
         {
             deliveryDate = deliDate;
+            deliveryNumber = deliNo;
         }
         private async void error(string details)
         {
