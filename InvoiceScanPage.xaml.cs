@@ -132,7 +132,6 @@ namespace SerialSearcher
         private async void GetScanButton_Click(object sender, RoutedEventArgs e)
         {
             NotificationTextBlock.Text = "Finding scanners...";
-            System.Diagnostics.Debug.WriteLine("Finding scanners...");
             var scanners = await DeviceInformation.FindAllAsync(DeviceClass.ImageScanner);
             NotificationTextBlock.Text = $"Using: {scanners[0].Name}";
 
@@ -148,9 +147,12 @@ namespace SerialSearcher
             // Get the scanner object
             try
             {
+                System.Diagnostics.Debug.WriteLine("1...");
                 myScanner = await ImageScanner.FromIdAsync(deviceId);
+                System.Diagnostics.Debug.WriteLine("2...");
                 if (myScanner.IsScanSourceSupported(ImageScannerScanSource.Default))
                 {
+                    System.Diagnostics.Debug.WriteLine("inside if...");
                     // Perform the scan to an in-memory stream
                     var stream = new InMemoryRandomAccessStream();
 
@@ -304,6 +306,7 @@ namespace SerialSearcher
                         }
                     } else
                     {
+
                         saveDetails(invNo.Text, (DateTimeOffset)invDate.Date, comp.Text, (bool)invSameDeli_Check.IsChecked);
                         DeliveryScanPage.deliveryNumber = invoiceNumber;
                         System.Diagnostics.Debug.WriteLine("invoice: " + invoiceNumber);

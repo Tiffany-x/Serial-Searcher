@@ -38,14 +38,11 @@ namespace SerialSearcher
             stack1.Width = Window.Current.Bounds.Width * 0.9 / 2;
             stack2.Width = Window.Current.Bounds.Width * 0.9 / 2;
             deliDate.MaxDate = DateTime.Now;
+
             deliDate.Date = InvoiceScanPage.invoiceDate;
 
-
             deliNo.Text = deliveryNumber;
-            if (deliveryDate != null)
-            {
-                deliDate.Date = deliveryDate;
-            }
+
             comp.Text = InvoiceScanPage.company;
             InitDeviceWatcher();
         }

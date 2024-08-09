@@ -292,6 +292,7 @@ namespace SerialSearcher
                             deviceQuery.Parameters.AddWithValue("@credNo", currentDevice["creditNo"]);
                             deviceQuery.Parameters.AddWithValue("@createdAt", DateTime.Now);
                             deviceQuery.Parameters.AddWithValue("@company", currentDevice["company"]);
+                            System.Diagnostics.Debug.WriteLine(deviceType);
 
                             // Execute the query
                             try
@@ -299,14 +300,6 @@ namespace SerialSearcher
                                 deviceQuery.ExecuteNonQuery();
                                 ShowToastNotification("Success", "Device has been recorded.");
                                 clearAll();
-                                InvoiceScanPage.invoicePath = "";
-                                InvoiceScanPage.invoiceNumber = "";
-                                InvoiceScanPage.invoiceDate = DateTimeOffset.Now;
-                                DeliveryScanPage.deliPath = "";
-                                DeliveryScanPage.deliveryNumber = "";
-                                DeliveryScanPage.deliveryDate = DateTimeOffset.Now;
-                                CreditScanPage.creditNumber = "";
-                                CreditScanPage.creditPath = "";
                             }
                             catch (Exception ex)
                             {
@@ -334,6 +327,7 @@ namespace SerialSearcher
                 return;
             } else if (reps < CreditScanPage.devices)
             {
+                
                 if (deviceType == "" || serialNo.Text == "" || modelName.Text == "")
                 {
                     error("PLease fill in all the values.");
@@ -414,6 +408,14 @@ namespace SerialSearcher
             modelName.Text = "";
             specs.Text = "";
             systInstall.Text = "";
+            InvoiceScanPage.invoicePath = "";
+            InvoiceScanPage.invoiceNumber = "";
+            InvoiceScanPage.invoiceDate = DateTimeOffset.Now;
+            DeliveryScanPage.deliPath = "";
+            DeliveryScanPage.deliveryNumber = "";
+            DeliveryScanPage.deliveryDate = DateTimeOffset.Now;
+            CreditScanPage.creditNumber = "";
+            CreditScanPage.creditPath = "";
         }
 
         private void backButton_Click(object sender, RoutedEventArgs e)
@@ -423,8 +425,8 @@ namespace SerialSearcher
 
         private void Devices_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            chosenDevice = args.SelectedItem.ToString();
-            if (chosenDevice == "Desktop" || deviceType == "Laptop")
+            deviceType = args.SelectedItem.ToString();
+            if (deviceType == "Desktop" || deviceType == "Laptop")
             {
                 systemInstall.Visibility = Visibility.Visible;
                 systInstall.Visibility = Visibility.Visible;
@@ -432,7 +434,7 @@ namespace SerialSearcher
                 specs.Visibility = Visibility.Visible;
 
             }
-            else if (chosenDevice != "Desktop" || deviceType != "Laptop")
+            else if (deviceType != "Desktop" || deviceType != "Laptop")
             {
                 systemInstall.Visibility = Visibility.Collapsed;
                 systInstall.Visibility = Visibility.Collapsed;
@@ -440,11 +442,10 @@ namespace SerialSearcher
                 specs.Visibility = Visibility.Collapsed;
             }
         }
-        public string chosenDevice;
         private void DeviceSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            chosenDevice = args.QueryText;
-            if (chosenDevice == "Desktop" || deviceType == "Laptop")
+            deviceType = args.QueryText;
+            if (deviceType == "Desktop" || deviceType == "Laptop")
             {
                 systemInstall.Visibility = Visibility.Visible;
                 systInstall.Visibility = Visibility.Visible;
@@ -452,7 +453,7 @@ namespace SerialSearcher
                 specs.Visibility = Visibility.Visible;
 
             }
-            else if (chosenDevice != "Desktop" || deviceType != "Laptop")
+            else if (deviceType != "Desktop" || deviceType != "Laptop")
             {
                 systemInstall.Visibility = Visibility.Collapsed;
                 systInstall.Visibility = Visibility.Collapsed;
